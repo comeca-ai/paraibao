@@ -1,0 +1,499 @@
+{# Base do Paraibão.
+
+   Estrutura de navegação copiada do estadao.com.br:
+   - barra fina, fio embaixo, nada flutuando
+   - editorias vivem NA barra, não atrás de um hambúrguer
+   - no mobile a mesma barra vira aba que rola na horizontal
+   - o menu grande sobra para o que não cabe na barra: contagem por
+     editoria, cidades e os 223 municípios
+
+   O botão de tema saiu junto com o tema escuro: o desenho agora é
+   claro de ponta a ponta, como o do Estadão. A versão anterior está
+   em static/styles-v1-brutalista.css.
+#}<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}{{ jornal.nome }} — Suas notícias {{ uf.uf_com_artigo }}{% endblock %}</title>
+<meta name="description" content="{% block descricao %}As notícias {{ uf.uf_com_artigo }} em um só lugar. Segurança, política, município, esportes e educação com apuração local.{% endblock %}">
+<link rel="canonical" href="{{ canonical_externo or (base_url ~ caminho) }}">
+<meta property="og:site_name" content="{{ jornal.nome }}">
+<meta property="og:type" content="{% block og_tipo %}website{% endblock %}">
+<meta property="og:title" content="{{ self.titulo() }}">
+<meta property="og:description" content="{{ self.descricao() }}">
+<meta property="og:url" content="{{ base_url }}{{ caminho }}">
+{# Imagem que aparece ao compartilhar no WhatsApp, Facebook e X.
+   Aqui fica a da marca, em 1200x630 (o formato que essas plataformas
+   recortam sem cortar nada). A MATÉRIA sobrescreve este bloco com a foto
+   dela: foto da notícia sempre puxa mais clique que arte institucional,
+   e a arte existe justamente para a home, seções e páginas sem foto. #}
+{% block og_imagem %}
+{% if jornal.og_imagem %}
+<meta property="og:image" content="{{ base_url }}{{ jornal.og_imagem }}?v={{ assets_v.og }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="{{ jornal.nome }} · {{ jornal.slogan }}">
+{% endif %}
+{% endblock %}
+{% block og_extra %}{% endblock %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#ffffff">
+<link href="/static/fontes.css?v={{ assets_v.fontes }}" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css?v={{ assets_v.css }}">
+{% block jsonld %}{% endblock %}
+</head>
+<body>
+
+<!-- ============================ 1 · TOPO ============================ -->
+<header class="topbar">
+  {# Sem bloco de fundo: a palavra sozinha, grande, na cor da marca. Por isso
+     aqui é a `logo-marca.svg` e não a `logo.svg`, que é branca e serve para o
+     menu e o rodapé, que têm fundo escuro. #}
+  <a class="topbar__cell topbar__cell--logo" href="/">
+    {% if jornal.logo_marca %}
+    <img src="{{ jornal.logo_marca }}?v={{ assets_v.logo }}" alt="{{ jornal.nome }}">
+    {% else %}
+    {# Praça sem logo pronta: o letreiro sai em texto, na fonte da casa. É
+       melhor entrar no ar assim do que exibir a marca de outro jornal. #}
+    <span class="topbar__letreiro">{{ jornal.nome }}</span>
+    {% endif %}
+  </a>
+
+  {# As editorias na própria barra. É o que dispensa o hambúrguer no
+     desktop e vira a régua de abas no celular.
+
+     Editoria com matéria ganha `data-painel`: passar o mouse (ou dar foco
+     pelo teclado) abre o painel correspondente lá embaixo. Editoria sem
+     matéria não recebe o atributo e continua sendo só um link, em vez de
+     abrir um painel vazio. #}
+  <nav class="topbar__nav" aria-label="Seções">
+    <a href="/ultimas"
+       {%- if paineis.get('ultimas') %} data-painel="ultimas" aria-expanded="false"{% endif %}
+       {%- if secao == 'home' or secao == 'ultimas' %} class="is-atual"{% endif %}>Últimas</a>
+    {% for ed in editorias_nav %}
+    <a href="/editoria/{{ ed.slug }}"
+       {%- if paineis.get(ed.slug) %} data-painel="{{ ed.slug }}" aria-expanded="false"{% endif %}
+       {%- if secao == 'editoria:' ~ ed.slug %} class="is-atual"{% endif %}>{{ ed.rotulo }}</a>
+    {% endfor %}
+    <a href="/municipios"{% if secao == 'municipios' %} class="is-atual"{% endif %}>Municípios</a>
+  </nav>
+
+  {# Indicador de arraste da régua de seções. Só existe no celular; no
+     desktop o CSS o esconde. #}
+  <div class="topbar__trilho" id="trilho" aria-hidden="true"><span></span></div>
+
+  <div class="topbar__espaco"></div>
+
+  {# A busca abre na própria barra, sem trocar de página: o campo cresce
+     sobre o espaço vazio e o resto some. Fecha no Esc ou no X. #}
+  <form class="topbar__busca" id="busca-form" action="/busca" method="get" role="search">
+    <input type="search" name="q" id="busca-input" placeholder="Buscar no {{ jornal.nome }}"
+           autocomplete="off" aria-label="Buscar notícias" value="{{ q or '' }}">
+    <button type="submit" aria-label="Buscar">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="7.2" stroke="currentColor" stroke-width="2.6"/>
+        <path d="m20 20-3.9-3.9" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button type="button" id="busca-fechar" aria-label="Fechar busca">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </form>
+
+  {# Lupa e hambúrguer são os do design original do Wander, no traço dele:
+     lupa 26px com traço 2.6, e o hambúrguer de 34x29 com barra de 5px que
+     vira X ao abrir o menu. Não redesenhar. #}
+  <button class="topbar__botao" id="btn-busca" aria-label="Buscar" aria-expanded="false">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <circle cx="11" cy="11" r="7.2" stroke="currentColor" stroke-width="2.6"/>
+      <path d="m20 20-3.9-3.9" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <button class="topbar__botao" id="btn-menu"
+          aria-expanded="false" aria-controls="mega" aria-label="Abrir menu">
+    <span class="burger"><span></span><span></span><span></span></span>
+  </button>
+</header>
+
+<!-- ================= PAINÉIS DE EDITORIA (hover) =================
+     Renderizados no servidor, escondidos, um por editoria. Sem busca no
+     ar quando o mouse passa: o painel já está na página, então ele abre
+     no mesmo quadro. São ~7 chamadas por editoria e as fotos são lazy,
+     então nada é baixado enquanto o painel não aparece.
+-->
+{% set nav_paineis = [{'slug': 'ultimas', 'rotulo': 'Últimas'}] + editorias_nav %}
+{% for ed in nav_paineis if paineis.get(ed.slug) %}
+{% set lista = paineis[ed.slug] %}
+{% set destino = '/ultimas' if ed.slug == 'ultimas' else '/editoria/' ~ ed.slug %}
+<div class="painel" id="painel-{{ ed.slug }}" aria-hidden="true">
+  <div class="painel__inner">
+    <div class="painel__col painel__col--menu">
+      <span class="painel__titulo">{{ ed.rotulo }}</span>
+      <a href="{{ destino }}">Tudo de {{ ed.rotulo }}</a>
+      {# Município é o diferencial do projeto: quem lê "Segurança" quer
+         saber de qual cidade. Por isso a coluna lista as cidades que
+         aparecem nas matérias recentes desta editoria, e não uma árvore
+         de subseções que o Paraibão não tem.
+         `ns.vistos` existe porque a mesma cidade se repete em várias
+         matérias e o painel não pode listar João Pessoa cinco vezes. #}
+      {% set ns = namespace(vistos=[]) %}
+      {% for m in lista if m.municipio and m.municipio not in ns.vistos %}
+      {% set ns.vistos = ns.vistos + [m.municipio] %}
+      <a href="/municipio/{{ m.municipio_slug }}">{{ m.municipio }}</a>
+      {% endfor %}
+      <a href="/municipios">Os {{ total_municipios }} municípios</a>
+    </div>
+
+    <div class="painel__col painel__col--noticias">
+      <span class="painel__titulo">Notícias mais recentes</span>
+      <div class="painel__grade">
+        {% for a in lista[1:7] %}
+        <a class="painel__item" href="{{ a.url }}"{{ a.alvo }}>
+          {% if a.imagem %}<img src="{{ a.imagem }}" alt="" loading="lazy" decoding="async">{% endif %}
+          <span>{{ a.titulo }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      <a class="painel__mais" href="{{ destino }}">Veja mais →</a>
+    </div>
+
+    {% if lista %}
+    <a class="painel__destaque" href="{{ lista[0].url }}"{{ lista[0].alvo }}>
+      {% if lista[0].imagem %}<img src="{{ lista[0].imagem }}" alt="" loading="lazy" decoding="async">{% endif %}
+      <span class="rotulo rotulo--marca">{{ lista[0].editoria }}</span>
+      <h3 class="display">{{ lista[0].titulo }}</h3>
+      <span class="tempo">{{ lista[0].fonte }} · {{ lista[0].tempo }}</span>
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+
+<div class="cortina" id="cortina" aria-hidden="true"></div>
+
+<!-- ====================== MENU EXPANDIDO ====================== -->
+<div class="mega" id="mega" aria-hidden="true">
+  <div class="mega__inner">
+    <div class="mega__grade">
+
+      <nav class="mega__col">
+        <span class="rotulo rotulo--marca">Seções</span>
+        {% for ed in menu_editorias_a %}
+        <a href="/editoria/{{ ed.slug }}"><span class="display">{{ ed.rotulo }}</span><em>{{ ed.total }}</em></a>
+        {% endfor %}
+      </nav>
+
+      <nav class="mega__col">
+        <span class="rotulo rotulo--marca">Ainda mais no {{ jornal.nome }}</span>
+        {% for ed in menu_editorias_b %}
+        <a href="/editoria/{{ ed.slug }}"><span class="display">{{ ed.rotulo }}</span><em>{{ ed.total }}</em></a>
+        {% endfor %}
+      </nav>
+
+      <div class="mega__col mega__col--cidades">
+        <span class="rotulo rotulo--marca">Por cidade</span>
+        {% for m in menu_cidades %}
+        <a href="/municipio/{{ m.slug }}"><span class="display">{{ m.nome }}</span></a>
+        {% endfor %}
+        <a href="/municipios"><span class="display">Ver os {{ total_municipios }}</span></a>
+
+        {# Grupo próprio: anunciar e escrever no jornal não são "cidades",
+           e na mesma lista pareciam mais dois municípios. #}
+        <span class="rotulo rotulo--marca mega__grupo">Fale com a gente</span>
+        <a href="/anuncie"><span class="display">Anuncie no {{ jornal.nome }}</span></a>
+        <a href="/escreva"><span class="display">Escreva com a gente</span></a>
+
+        <div class="mega__sociais">
+          <span aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.9" stroke="currentColor" stroke-width="1.7"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor"/></svg></span>
+          <span aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.6 8.6h2.1V5.7h-2.5c-2.2 0-3.5 1.3-3.5 3.5v1.9H8.4v2.9h2.3V21h3v-7h2.3l.4-2.9h-2.7V9.7c0-.7.3-1.1.9-1.1z" fill="currentColor"/></svg></span>
+          <span aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.6" y="5.6" width="18.8" height="12.8" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10.5 9.5 15 12l-4.5 2.5v-5z" fill="currentColor"/></svg></span>
+          <span aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8.1 18.7L4 20z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+
+      {% if destaque_menu %}
+      <article class="mega__destaque">
+        <span class="rotulo mega__badge">Agora</span>
+        <h3 class="display"><a href="{{ destaque_menu.url }}"{{ destaque_menu.alvo }}>{{ destaque_menu.titulo }}</a></h3>
+        {% if destaque_menu.imagem %}<img src="{{ destaque_menu.imagem }}" alt="" loading="lazy">{% endif %}
+        <a class="mega__botao" href="{{ destaque_menu.url }}"{{ destaque_menu.alvo }}>Ler matéria →</a>
+      </article>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+{# Faixa de largura total (a previsão do tempo). Fica FORA do `main`
+   porque o `main` é limitado ao container: dentro dele o fio de baixo
+   pararia nas bordas em vez de atravessar a tela como o da barra. #}
+{% block faixa %}{% endblock %}
+
+<main class="corpo">
+{% block conteudo %}{% endblock %}
+</main>
+
+<!-- ============================ RODAPÉ ============================ -->
+<footer class="rodape">
+    <div class="rodape__topo">
+      <div class="rodape__marca">
+        {% if jornal.logo_branca %}
+        <img src="{{ jornal.logo_branca }}?v={{ assets_v.logo }}" alt="{{ jornal.nome }}">
+        {% else %}<span class="topbar__letreiro rodape__letreiro">{{ jornal.nome }}</span>{% endif %}
+        <p>As notícias {{ uf.uf_com_artigo }} em um só lugar, com apuração local e cobertura diária.</p>
+        <div class="rodape__sociais">
+          <span aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.9" stroke="currentColor" stroke-width="1.7"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor"/></svg></span>
+          <span aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.6 8.6h2.1V5.7h-2.5c-2.2 0-3.5 1.3-3.5 3.5v1.9H8.4v2.9h2.3V21h3v-7h2.3l.4-2.9h-2.7V9.7c0-.7.3-1.1.9-1.1z" fill="currentColor"/></svg></span>
+          <span aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.6" y="5.6" width="18.8" height="12.8" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10.5 9.5 15 12l-4.5 2.5v-5z" fill="currentColor"/></svg></span>
+          <span aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8.1 18.7L4 20z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+      <div class="rodape__col">
+        <span class="rotulo rotulo--marca">Seções</span>
+        {% for ed in menu_editorias_a %}<a href="/editoria/{{ ed.slug }}">{{ ed.rotulo }}</a>{% endfor %}
+      </div>
+      <div class="rodape__col">
+        <span class="rotulo rotulo--marca">Cidades</span>
+        {% for m in menu_cidades %}<a href="/municipio/{{ m.slug }}">{{ m.nome }}</a>{% endfor %}
+        <a href="/municipios">Os {{ total_municipios }} municípios</a>
+      </div>
+      <div class="rodape__col">
+        <span class="rotulo rotulo--marca">Institucional</span>
+        <a href="/anuncie">Anuncie no {{ jornal.nome }}</a>
+        <a href="/escreva">Escreva com a gente</a>
+        <a href="/ultimas">Últimas</a><a href="/busca">Buscar</a><a href="/sitemap.xml">Sitemap</a>
+      </div>
+    </div>
+    <div class="rodape__legal">
+      <span>© {{ jornal.nome }}, {{ ano }}. As matérias assinaladas com ↗ são chamadas para o veículo de origem.</span>
+      <span>Feito em {{ jornal.praca }}</span>
+    </div>
+</footer>
+
+<script>
+(function () {
+  // ---- painel de editoria, aberto no hover da barra ----
+  // Abre com atraso curto e fecha com atraso maior: sem isso o painel
+  // pisca ao atravessar a barra com o mouse, e some no vão entre o link
+  // e o painel quando o leitor vai em diagonal buscar uma notícia.
+  var cortina = document.getElementById('cortina');
+  var gatilhos = document.querySelectorAll('.topbar__nav a[data-painel]');
+  var aberto = null, tAbrir = null, tFechar = null;
+
+  function mostrar(slug) {
+    if (aberto === slug) return;
+    if (aberto) esconder(true);
+    var p = document.getElementById('painel-' + slug);
+    var g = document.querySelector('.topbar__nav a[data-painel="' + slug + '"]');
+    if (!p) return;
+    p.classList.add('is-open');
+    p.setAttribute('aria-hidden', 'false');
+    if (g) g.setAttribute('aria-expanded', 'true');
+    cortina.classList.add('is-open');
+    aberto = slug;
+  }
+
+  function esconder(imediato) {
+    if (!aberto) return;
+    var p = document.getElementById('painel-' + aberto);
+    var g = document.querySelector('.topbar__nav a[data-painel="' + aberto + '"]');
+    if (p) { p.classList.remove('is-open'); p.setAttribute('aria-hidden', 'true'); }
+    if (g) g.setAttribute('aria-expanded', 'false');
+    aberto = null;
+    if (!imediato) cortina.classList.remove('is-open');
+    else cortina.classList.remove('is-open');
+  }
+
+  function agendarFechar() {
+    clearTimeout(tFechar);
+    tFechar = setTimeout(function () { esconder(); }, 220);
+  }
+
+  // Como o item se comporta depende do PONTEIRO do momento, não de media
+  // query: `(hover: none)` mente em aparelho híbrido e em janela estreita
+  // no desktop. `pointerType` vem no próprio evento e não tem esse problema.
+  //
+  // Dedo: o primeiro toque abre o painel, o segundo no mesmo item navega.
+  // Mouse: hover abre, clique navega direto.
+  var ultimoPonteiro = 'mouse';
+  document.addEventListener('pointerdown', function (e) {
+    ultimoPonteiro = e.pointerType || 'mouse';
+  }, { capture: true, passive: true });
+
+  gatilhos.forEach(function (g) {
+    var slug = g.dataset.painel;
+
+    g.addEventListener('click', function (e) {
+      if (ultimoPonteiro === 'mouse') return;   // desktop: deixa navegar
+      if (aberto === slug) return;              // já aberto: segundo toque navega
+      e.preventDefault();
+      mostrar(slug);
+    });
+
+    g.addEventListener('mouseenter', function () {
+      if (ultimoPonteiro !== 'mouse') return;
+      clearTimeout(tFechar); clearTimeout(tAbrir);
+      tAbrir = setTimeout(function () { mostrar(slug); }, 110);
+    });
+    g.addEventListener('mouseleave', function () { clearTimeout(tAbrir); agendarFechar(); });
+    // teclado: o painel também abre no foco, senão ele só existe para mouse
+    g.addEventListener('focus', function () { mostrar(slug); });
+  });
+
+  // ---- régua de seções no celular ----
+  // Ela avança sozinha de tempos em tempos para revelar que existe mais
+  // coisa à direita, e para de avançar assim que o leitor encosta nela:
+  // conteúdo que se move sob o dedo é o oposto de ajudar.
+  var regua = document.querySelector('.topbar__nav');
+  var trilho = document.getElementById('trilho');
+  if (regua && trilho) {
+    var barra = trilho.firstElementChild;
+
+    function pintarTrilho() {
+      var total = regua.scrollWidth, visivel = regua.clientWidth;
+      if (total <= visivel + 4) { trilho.style.display = 'none'; return; }
+      var largura = Math.max(18, (visivel / total) * 100);
+      var andou = (regua.scrollLeft / (total - visivel)) * (100 - largura);
+      barra.style.width = largura + '%';
+      barra.style.transform = 'translateX(' + (andou / largura * 100) + '%)';
+    }
+
+    // Anda um pedaço e para. O deslizamento contínuo não deixava o leitor
+    // ler nada: o nome estava sempre em movimento. Aqui cada passo revela
+    // um trecho novo e descansa, que é o tempo de bater o olho.
+    //
+    // O movimento do passo é animado à mão com easing, e não com
+    // `scroll-behavior: smooth`, porque assim o tempo e a curva são nossos
+    // e o passo fica lento de propósito.
+    var PASSO = 0.55;        // fração da largura visível por vez
+    var DURACAO = 900;       // quanto dura o deslizar de um passo
+    var PAUSA = 2600;        // quanto ele descansa entre um passo e outro
+    var sentido = 1, pausado = false, retomar = null;
+    var animando = false, t0 = 0, de = 0, para = 0, proximo = 0;
+
+    function limite() { return regua.scrollWidth - regua.clientWidth; }
+    // desacelera no fim do passo, para ele "encostar" em vez de estancar
+    function suavizar(t) { return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2; }
+
+    function quadro(agora) {
+      requestAnimationFrame(quadro);
+      var fim = limite();
+      if (fim <= 4) return;
+
+      if (animando) {
+        var t = Math.min(1, (agora - t0) / DURACAO);
+        regua.scrollLeft = de + (para - de) * suavizar(t);
+        if (t >= 1) { animando = false; proximo = agora + PAUSA; }
+        return;
+      }
+
+      if (pausado || agora < proximo) return;
+
+      de = regua.scrollLeft;
+      para = de + fim * 0 + regua.clientWidth * PASSO * sentido;
+      // chegou na ponta: inverte e volta, em vez de saltar para o começo
+      if (para >= fim) { para = fim; sentido = -1; }
+      else if (para <= 0) { para = 0; sentido = 1; }
+      if (Math.abs(para - de) < 2) { sentido = -sentido; proximo = agora + PAUSA; return; }
+
+      t0 = agora;
+      animando = true;
+    }
+
+    // Encostou o dedo, o comando é do leitor. Volta a andar sozinha depois
+    // de um tempo parada, senão a régua morre no primeiro toque acidental.
+    ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) {
+      regua.addEventListener(ev, function () {
+        pausado = true;
+        clearTimeout(retomar);
+        animando = false;              // corta o passo em andamento na hora
+        retomar = setTimeout(function () {
+          pausado = false;
+          proximo = 0;                 // retoma de onde o leitor deixou
+        }, 6000);
+      }, { passive: true });
+    });
+
+    regua.addEventListener('scroll', pintarTrilho, { passive: true });
+    window.addEventListener('resize', pintarTrilho);
+    pintarTrilho();
+
+    // Quem pediu menos animação no sistema não recebe régua andando sozinha.
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      requestAnimationFrame(quadro);
+    }
+  }
+
+  document.querySelectorAll('.painel').forEach(function (p) {
+    p.addEventListener('mouseenter', function () { clearTimeout(tFechar); });
+    p.addEventListener('mouseleave', agendarFechar);
+  });
+
+  cortina.addEventListener('mouseenter', function () { esconder(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && aberto) esconder();
+  });
+  // rolar a página com o painel aberto deixa ele solto no meio da tela
+  window.addEventListener('scroll', function () { if (aberto) esconder(); }, { passive: true });
+
+  // busca na própria barra
+  var btnBusca = document.getElementById('btn-busca');
+  var formBusca = document.getElementById('busca-form');
+  var inputBusca = document.getElementById('busca-input');
+  function abrirBusca(estado) {
+    document.body.classList.toggle('busca-aberta', estado);
+    btnBusca.setAttribute('aria-expanded', String(estado));
+    if (estado) { inputBusca.focus(); inputBusca.select(); }
+  }
+  if (btnBusca && formBusca) {
+    btnBusca.addEventListener('click', function () {
+      abrirBusca(!document.body.classList.contains('busca-aberta'));
+    });
+    document.getElementById('busca-fechar').addEventListener('click', function () {
+      abrirBusca(false);
+    });
+    inputBusca.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { abrirBusca(false); btnBusca.focus(); }
+    });
+    // não envia busca vazia
+    formBusca.addEventListener('submit', function (e) {
+      if (!inputBusca.value.trim()) { e.preventDefault(); inputBusca.focus(); }
+    });
+  }
+
+  var btn  = document.getElementById('btn-menu');
+  var mega = document.getElementById('mega');
+  if (!btn || !mega) return;
+
+  function abrir(estado) {
+    mega.classList.toggle('is-open', estado);
+    mega.setAttribute('aria-hidden', String(!estado));
+    btn.setAttribute('aria-expanded', String(estado));
+    // a classe é quem faz o hambúrguer virar X, igual ao design original
+    document.documentElement.classList.toggle('menu-aberto', estado);
+    document.body.style.overflow = estado ? 'hidden' : '';
+    btn.setAttribute('aria-label', estado ? 'Fechar menu' : 'Abrir menu');
+  }
+
+  btn.addEventListener('click', function () {
+    abrir(!mega.classList.contains('is-open'));
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && mega.classList.contains('is-open')) abrir(false);
+  });
+  // fecha ao clicar fora do painel e fora do botão
+  document.addEventListener('click', function (e) {
+    if (!mega.classList.contains('is-open')) return;
+    if (mega.contains(e.target) || btn.contains(e.target)) return;
+    abrir(false);
+  });
+})();
+</script>
+</body>
+</html>

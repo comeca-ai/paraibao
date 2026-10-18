@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paraibão — Suas notícias da Paraíba</title>
+<meta name="description" content="As notícias da Paraíba em um só lugar. Segurança, política, município, esportes e educação com apuração local.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="./css2%3Ffamily=Anton&amp;family=DM+Sans:wght@400%3B500%3B700&amp;display=swap.css" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script>
+  // define o tema antes de pintar, senao pisca claro antes de virar escuro
+  (function () {
+    var t = localStorage.getItem('paraibao-tema');
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-tema', t);
+  })();
+</script>
+</head>
+<body>
+
+<!-- ============================ 1 · HEADER ============================ -->
+<header class="topbar">
+  <div class="topbar__cell topbar__cell--logo">
+    <a href="index.html"><img src="img/logo.svg" alt="Paraibão"></a>
+  </div>
+  <div class="topbar__espaco"></div>
+  <button class="topbar__cell topbar__cell--icon topbar__botao" aria-label="Buscar">
+    <span class="topbar__rotulo rotulo">Buscar</span>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <circle cx="11" cy="11" r="7.2" stroke="currentColor" stroke-width="2.6"/>
+      <path d="m20 20-3.9-3.9" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button class="topbar__cell topbar__cell--icon topbar__botao" id="btn-tema" aria-label="Mudar para o tema escuro">
+    <span class="topbar__rotulo rotulo" data-claro="Tema escuro" data-escuro="Tema claro">Tema escuro</span>
+    <svg class="tema__icone tema__icone--lua" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+    </svg>
+    <svg class="tema__icone tema__icone--sol" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.9"/>
+      <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button class="topbar__cell topbar__cell--icon topbar__botao" id="btn-menu"
+          aria-expanded="false" aria-controls="mega" aria-label="Abrir menu">
+    <span class="topbar__rotulo rotulo" data-abrir="Abrir menu" data-fechar="Fechar menu">Abrir menu</span>
+    <span class="burger"><span></span><span></span><span></span></span>
+  </button>
+</header>
+
+<!-- ====================== MENU EXPANDIDO ====================== -->
+<div class="mega" id="mega" aria-hidden="true">
+  <div class="mega__inner">
+    <div class="mega__grade">
+
+      <nav class="mega__col">
+        <span class="rotulo rotulo--vermelho">Editorias</span>
+        <a href="index.html#"><span class="display">Segurança</span><em>4.072</em></a>
+        <a href="index.html#"><span class="display">Município</span><em>4.345</em></a>
+        <a href="index.html#"><span class="display">Política</span><em>2.421</em></a>
+        <a href="index.html#"><span class="display">Economia</span><em>1.660</em></a>
+        <a href="index.html#"><span class="display">Educação</span><em>1.008</em></a>
+      </nav>
+
+      <nav class="mega__col">
+        <span class="rotulo rotulo--vermelho">Mais no Paraibão</span>
+        <a href="index.html#"><span class="display">Esportes</span><em>6.216</em></a>
+        <a href="index.html#"><span class="display">Entretenimento</span><em>4.148</em></a>
+        <a href="index.html#"><span class="display">Saúde</span><em>2.672</em></a>
+        <a href="index.html#"><span class="display">Ciência e Tecnologia</span><em>3.119</em></a>
+        <a href="index.html#"><span class="display">Empresas</span><em>novo</em></a>
+      </nav>
+
+      <div class="mega__col mega__col--cidades">
+        <span class="rotulo rotulo--vermelho">Por cidade</span>
+        <a href="index.html#"><span class="display">João Pessoa</span></a>
+        <a href="index.html#"><span class="display">Campina Grande</span></a>
+        <a href="index.html#"><span class="display">Sertão</span></a>
+        <a href="index.html#"><span class="display">Litoral</span></a>
+        <div class="mega__sociais">
+          <a href="index.html#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.9" stroke="currentColor" stroke-width="1.7"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor"/></svg></a>
+          <a href="index.html#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.6 8.6h2.1V5.7h-2.5c-2.2 0-3.5 1.3-3.5 3.5v1.9H8.4v2.9h2.3V21h3v-7h2.3l.4-2.9h-2.7V9.7c0-.7.3-1.1.9-1.1z" fill="currentColor"/></svg></a>
+          <a href="index.html#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.6" y="5.6" width="18.8" height="12.8" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10.5 9.5 15 12l-4.5 2.5v-5z" fill="currentColor"/></svg></a>
+          <a href="index.html#" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8.1 18.7L4 20z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+
+      <article class="mega__destaque">
+        <span class="rotulo mega__badge">Agora</span>
+        <h3 class="display"><a href="materia.html">PF e Receita Federal apreendem meia tonelada de drogas</a></h3>
+        <img src="img/pf.jpg" alt="">
+        <a class="mega__botao rotulo" href="materia.html">Ler matéria →</a>
+      </article>
+
+    </div>
+  </div>
+</div>
+
+<main class="corpo">
+
+  <!-- ========================== 2 · FAIXA AGORA ========================== -->
+  <div class="agora">
+    <div class="agora__selo rotulo">Agora</div>
+    <div class="agora__pista">
+      <div class="agora__trilho">
+        <a href="materia.html"><time>14h12</time>PF e Receita Federal apreendem meia tonelada de drogas em João Pessoa</a>
+        <span class="agora__ponto"></span>
+        <a href="materia.html"><time>13h40</time>Operação mira organização criminosa ligada ao tráfico e lavagem de dinheiro</a>
+        <span class="agora__ponto"></span>
+        <a href="materia.html"><time>12h55</time>UFPB aprova dois novos cursos superiores para o segundo semestre de 2026</a>
+        <span class="agora__ponto"></span>
+        <a href="materia.html"><time>11h30</time>Colisão entre caminhões deixa vítima presa às ferragens na BR-230</a>
+        <span class="agora__ponto"></span>
+        <a href="materia.html"><time>10h05</time>Vila Olímpica sedia quadrangular final da Copa Paraíba neste sábado</a>
+        <span class="agora__ponto"></span>
+        <a href="materia.html"><time>09h20</time>Deputado entra no rodízio de suplentes do Rede e cede cadeira</a>
+        <span class="agora__ponto"></span>
+      </div>
+      <div class="agora__trilho" aria-hidden="true">
+        <a href="materia.html"><time>14h12</time>PF e Receita Federal apreendem meia tonelada de drogas em João Pessoa</a>
+        <span class="agora__ponto"></span>
+        <a href="materia.html"><time>13h40</time>Operação mira organização criminosa ligada ao tráfico e lavagem de dinheiro</a>
+        <span class="agora__ponto"></span>
+        <a href="materia.html"><time>12h55</time>UFPB aprova dois novos cursos superiores para o segundo semestre de 2026</a>
+        <span class="agora__ponto"></span>
+        <a href="materia.html"><time>11h30</time>Colisão entre caminhões deixa vítima presa às ferragens na BR-230</a>
+        <span class="agora__ponto"></span>
+        <a href="materia.html"><time>10h05</time>Vila Olímpica sedia quadrangular final da Copa Paraíba neste sábado</a>
+        <span class="agora__ponto"></span>
+        <a href="materia.html"><time>09h20</time>Deputado entra no rodízio de suplentes do Rede e cede cadeira</a>
+        <span class="agora__ponto"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ 3 · DOBRA ============================ -->
+  <section class="bloco dobra">
+    <article class="dobra__principal">
+      <div class="dobra__meta">
+        <span class="chip rotulo">Segurança</span>
+        <span class="rotulo">Há 40 minutos</span>
+      </div>
+      <h1 class="display dobra__titulo"><a href="materia.html">PF e Receita Federal apreendem meia tonelada de drogas em João Pessoa</a></h1>
+      <p class="dobra__olho">Operação conjunta cumpriu mandados em três bairros da capital e apreendeu material que seria distribuído no litoral paraibano durante a alta temporada.</p>
+      <img class="dobra__foto" src="img/pf.jpg" alt="Agentes da Polícia Federal durante a operação em João Pessoa">
+      <div class="assinatura">
+        <div class="assinatura__quem">
+          <b>Redação Paraibão</b><span>·</span><span>Atualizado há 40 minutos</span><span>·</span><span>15 min de leitura</span>
+        </div>
+      </div>
+    </article>
+
+    <div class="dobra__chamadas">
+      <article class="chamada">
+        <img src="img/ufpb.jpg" alt="">
+        <div class="chamada__texto">
+          <span class="rotulo rotulo--vermelho">Educação</span>
+          <h3 class="display"><a href="materia.html">UFPB aprova dois novos cursos superiores para 2026</a></h3>
+          <span class="tempo">há 2 horas &middot; 7 min de leitura</span>
+        </div>
+      </article>
+      <article class="chamada">
+        <img src="img/caminhao.jpg" alt="">
+        <div class="chamada__texto">
+          <span class="rotulo rotulo--vermelho">Município</span>
+          <h3 class="display"><a href="materia.html">Colisão entre caminhões deixa vítima presa na BR-230</a></h3>
+          <span class="tempo">há 3 horas &middot; 4 min de leitura</span>
+        </div>
+      </article>
+      <article class="chamada">
+        <img src="img/caixa.jpg" alt="">
+        <div class="chamada__texto">
+          <span class="rotulo rotulo--vermelho">Segurança</span>
+          <h3 class="display"><a href="materia.html">Ladrão invade agência e entala na porta giratória</a></h3>
+          <span class="tempo">há 4 horas &middot; 8 min de leitura</span>
+        </div>
+      </article>
+      <article class="chamada">
+        <img src="img/cbf.jpg" alt="">
+        <div class="chamada__texto">
+          <span class="rotulo rotulo--vermelho">Esportes</span>
+          <h3 class="display"><a href="materia.html">CBF anuncia fair play financeiro no futebol brasileiro</a></h3>
+          <span class="tempo">há 5 horas &middot; 10 min de leitura</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- =========================== 4 · EM ALTA =========================== -->
+  <section class="bloco">
+    <div class="faixa-secao">
+      <h2 class="display">Em alta</h2>
+      <a href="index.html#">Ver tudo →</a>
+    </div>
+    <div class="grade-4">
+      <article>
+        <img src="img/caixa.jpg" alt="Agência bancária">
+        <span class="rotulo rotulo--vermelho">Segurança</span>
+        <h3 class="display"><a href="materia.html">Ladrão invade agência, entala na porta giratória e acaba preso</a></h3>
+        <p class="resumo">Câmeras registraram a tentativa de fuga. Ele foi detido pela PM ainda dentro da agência.</p>
+        <span class="tempo">8 min</span>
+      </article>
+      <article>
+        <img src="img/enem.jpg" alt="Prova do Enem">
+        <span class="rotulo rotulo--vermelho">Educação</span>
+        <h3 class="display"><a href="materia.html">Enem: Campina Grande tem passagem de ônibus gratuita</a></h3>
+        <p class="resumo">A gratuidade vale para as linhas municipais nos dois domingos de aplicação da prova.</p>
+        <span class="tempo">12 min</span>
+      </article>
+      <article>
+        <img src="img/cbf.jpg" alt="Jogadores se cumprimentando">
+        <span class="rotulo rotulo--vermelho">Esportes</span>
+        <h3 class="display"><a href="materia.html">CBF anuncia fair play financeiro no futebol brasileiro</a></h3>
+        <p class="resumo">A regra passa a valer na próxima temporada e limita o teto de gastos dos clubes.</p>
+        <span class="tempo">10 min</span>
+      </article>
+      <article>
+        <img src="img/chio.jpg" alt="Deputado em evento">
+        <span class="rotulo rotulo--vermelho">Política</span>
+        <h3 class="display"><a href="materia.html">Deputado entra no rodízio de suplentes do Rede</a></h3>
+        <p class="resumo">A cadeira fica com um professor da rede estadual até o fim da legislatura.</p>
+        <span class="tempo">5 min</span>
+      </article>
+    </div>
+  </section>
+
+  <!-- ========================= 5 · ÚLTIMAS ========================= -->
+  <section class="bloco">
+    <div class="faixa-secao">
+      <h2 class="display">Últimas notícias</h2>
+      <a href="index.html#">Ver tudo →</a>
+    </div>
+
+    <div class="ultimas__destaque">
+      <div class="ultimas__foto">
+        <img src="img/pf.jpg" alt="Operação da Polícia Federal">
+      </div>
+      <div class="ultimas__texto">
+        <span class="rotulo rotulo--vermelho">Segurança</span>
+        <h3 class="display"><a href="materia.html">PF e Receita Federal apreendem quase meia tonelada de drogas em João Pessoa</a></h3>
+        <p class="resumo">Operação conjunta cumpriu mandados em três bairros da capital e apreendeu material que seria distribuído no litoral paraibano durante a alta temporada. Três pessoas foram detidas.</p>
+        <span class="tempo">15 min de leitura</span>
+      </div>
+    </div>
+
+    <div class="grade-4 grade-4--continuacao">
+      <article>
+        <img src="img/pf.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Segurança</span>
+        <h3 class="display"><a href="materia.html">Operação mira organização criminosa ligada ao tráfico</a></h3>
+        <p class="resumo">Investigação apura lavagem de dinheiro em empresas de fachada na Paraíba e em São Paulo.</p>
+        <span class="tempo">6 min</span>
+      </article>
+      <article>
+        <img src="img/ufpb.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Educação</span>
+        <h3 class="display"><a href="materia.html">UFPB aprova dois novos cursos superiores para 2026</a></h3>
+        <p class="resumo">A decisão saiu do Conselho Universitário e as vagas devem ser preenchidas pelo Sisu.</p>
+        <span class="tempo">7 min</span>
+      </article>
+      <article>
+        <img src="img/caminhao.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Município</span>
+        <h3 class="display"><a href="materia.html">Colisão entre caminhões deixa vítima presa na BR-230</a></h3>
+        <p class="resumo">Os bombeiros levaram cerca de duas horas para retirar o motorista das ferragens.</p>
+        <span class="tempo">4 min</span>
+      </article>
+      <article>
+        <img src="img/cbf.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Esportes</span>
+        <h3 class="display"><a href="materia.html">Vila Olímpica sedia quadrangular da Copa Paraíba</a></h3>
+        <p class="resumo">A decisão acontece no sábado e reúne os quatro melhores times da competição.</p>
+        <span class="tempo">5 min</span>
+      </article>
+    </div>
+  </section>
+
+  <!-- ======================= 6 · PRÓXIMO JOGO ======================= -->
+  <section class="bloco jogo">
+    <div class="faixa-secao">
+      <h2 class="display">Próximo jogo</h2>
+      <a href="index.html#">Ver tudo →</a>
+    </div>
+    <div class="jogo__arena">
+      <div class="jogo__confronto">
+        <div class="jogo__time">
+          <div class="jogo__escudo"></div>
+          <span class="display">Botafogo-PB</span>
+        </div>
+        <span class="display jogo__vs">VS</span>
+        <div class="jogo__time">
+          <div class="jogo__escudo"></div>
+          <span class="display">Campinense</span>
+        </div>
+      </div>
+      <div class="jogo__quando">Domingo, 3 de agosto · 16h00</div>
+      <div class="display jogo__local">Estádio Almeidão, João Pessoa</div>
+    </div>
+  </section>
+
+  <!-- ===================== 7 · VÍDEOS + TABELA ===================== -->
+  <section class="bloco duplo">
+    <div class="duplo__lado">
+      <div class="faixa-secao">
+        <h2 class="display">Vídeos</h2>
+        <a href="index.html#">Ver tudo →</a>
+      </div>
+      <article class="video">
+        <div class="video__thumb"></div>
+        <div class="video__texto">
+          <span class="rotulo rotulo--vermelho">Esportes</span>
+          <h3 class="display"><a href="materia.html">Bastidores da final da Copa Paraíba de futebol</a></h3>
+          <span class="tempo">8 min</span>
+        </div>
+      </article>
+      <article class="video">
+        <div class="video__thumb"></div>
+        <div class="video__texto">
+          <span class="rotulo rotulo--vermelho">Município</span>
+          <h3 class="display"><a href="materia.html">O que muda no trânsito da BR-230 com a nova obra</a></h3>
+          <span class="tempo">8 min</span>
+        </div>
+      </article>
+      <article class="video">
+        <div class="video__thumb"></div>
+        <div class="video__texto">
+          <span class="rotulo rotulo--vermelho">Educação</span>
+          <h3 class="display"><a href="materia.html">Como funciona o novo campus da UFPB em Campina</a></h3>
+          <span class="tempo">8 min</span>
+        </div>
+      </article>
+    </div>
+
+    <div class="duplo__lado">
+      <div class="faixa-secao">
+        <h2 class="display">Campeonato Paraibano</h2>
+        <a href="index.html#">Ver tudo →</a>
+      </div>
+      <table class="tabela">
+        <thead>
+          <tr><th>Time</th><th>V</th><th>D</th><th>Pts</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="tabela__time"><span class="tabela__escudo"></span>Botafogo-PB</span></td><td>8</td><td>2</td><td>26</td></tr>
+          <tr><td><span class="tabela__time"><span class="tabela__escudo"></span>Campinense</span></td><td>7</td><td>3</td><td>24</td></tr>
+          <tr><td><span class="tabela__time"><span class="tabela__escudo"></span>Treze</span></td><td>6</td><td>4</td><td>20</td></tr>
+          <tr><td><span class="tabela__time"><span class="tabela__escudo"></span>Sousa</span></td><td>5</td><td>4</td><td>19</td></tr>
+          <tr><td><span class="tabela__time"><span class="tabela__escudo"></span>Auto Esporte</span></td><td>4</td><td>6</td><td>14</td></tr>
+          <tr><td><span class="tabela__time"><span class="tabela__escudo"></span>Nacional de Patos</span></td><td>3</td><td>7</td><td>11</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- =================== 8 · DESTAQUE DA SEMANA =================== -->
+  <section class="bloco">
+    <div class="faixa-secao">
+      <h2 class="display">Destaque da semana</h2>
+      <a href="index.html#">Ver tudo →</a>
+    </div>
+    <div class="grade-4">
+      <article>
+        <img src="img/caminhao.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Município</span>
+        <h3 class="display"><a href="materia.html">Quatro trechos de praias estão impróprios para banho no litoral</a></h3>
+        <p class="resumo">O boletim vale para o fim de semana e cobre trechos de João Pessoa e Cabedelo.</p>
+        <span class="tempo">6 min</span>
+      </article>
+      <article>
+        <img src="img/cbf.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Esportes</span>
+        <h3 class="display"><a href="materia.html">Mixto-PB conquista o Campeonato Paraibano Feminino</a></h3>
+        <p class="resumo">Time garantiu o título na última rodada e assegurou vaga na competição nacional.</p>
+        <span class="tempo">9 min</span>
+      </article>
+      <article>
+        <img src="img/mersinho.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Política</span>
+        <h3 class="display"><a href="materia.html">Ex-deputado é nomeado para presidir o novo PTB na Paraíba</a></h3>
+        <p class="resumo">A nomeação foi confirmada pela direção nacional e vale até a próxima convenção.</p>
+        <span class="tempo">4 min</span>
+      </article>
+      <article>
+        <img src="img/crizane.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Política</span>
+        <h3 class="display"><a href="materia.html">Coordenadora do Orçamento apela pela aprovação da LOA</a></h3>
+        <p class="resumo">Sem a aprovação, a prefeitura fica impedida de executar parte dos investimentos.</p>
+        <span class="tempo">7 min</span>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================ 9 · RODAPÉ ============================ -->
+<footer class="rodape">
+    <div class="rodape__topo">
+      <div class="rodape__marca">
+        <img src="img/logo.svg" alt="Paraibão">
+        <p>As notícias da Paraíba em um só lugar, com apuração local e cobertura diária.</p>
+        <div class="rodape__sociais">
+          <a href="index.html#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.9" stroke="currentColor" stroke-width="1.7"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor"/></svg></a>
+          <a href="index.html#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.6 8.6h2.1V5.7h-2.5c-2.2 0-3.5 1.3-3.5 3.5v1.9H8.4v2.9h2.3V21h3v-7h2.3l.4-2.9h-2.7V9.7c0-.7.3-1.1.9-1.1z" fill="currentColor"/></svg></a>
+          <a href="index.html#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.6" y="5.6" width="18.8" height="12.8" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10.5 9.5 15 12l-4.5 2.5v-5z" fill="currentColor"/></svg></a>
+          <a href="index.html#" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8.1 18.7L4 20z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+      <div class="rodape__col">
+        <span class="rotulo rotulo--vermelho">Editorias</span>
+        <a href="index.html#">Segurança</a><a href="index.html#">Município</a><a href="index.html#">Política</a><a href="index.html#">Esportes</a><a href="index.html#">Educação</a>
+      </div>
+      <div class="rodape__col">
+        <span class="rotulo rotulo--vermelho">Institucional</span>
+        <a href="index.html#">Quem somos</a><a href="index.html#">Expediente</a><a href="index.html#">Privacidade</a><a href="index.html#">Anuncie</a>
+      </div>
+      <div class="rodape__col">
+        <span class="rotulo rotulo--vermelho">Mais</span>
+        <a href="index.html#">Newsletter</a><a href="index.html#">Vídeos</a><a href="index.html#">Especiais</a><a href="index.html#">Contato</a>
+      </div>
+    </div>
+    <div class="rodape__legal">
+      <span>© Paraibão, 2026. Todos os direitos reservados.</span>
+      <span>Feito em João Pessoa, Paraíba</span>
+    </div>
+</footer>
+
+<script>
+(function () {
+
+  // interruptor de tema
+  var btnTema = document.getElementById('btn-tema');
+  if (btnTema) {
+    btnTema.addEventListener('click', function () {
+      var atual = document.documentElement.getAttribute('data-tema') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-tema', atual);
+      localStorage.setItem('paraibao-tema', atual);
+      btnTema.setAttribute('aria-label', atual === 'dark' ? 'Mudar para o tema claro' : 'Mudar para o tema escuro');
+      var rotT = btnTema.querySelector('.topbar__rotulo');
+      if (rotT) rotT.textContent = atual === 'dark' ? rotT.dataset.escuro : rotT.dataset.claro;
+    });
+  }
+
+  var btn  = document.getElementById('btn-menu');
+  var mega = document.getElementById('mega');
+  if (!btn || !mega) return;
+
+  function abrir(estado) {
+    document.documentElement.classList.toggle('menu-aberto', estado);
+    mega.classList.toggle('is-open', estado);
+    mega.setAttribute('aria-hidden', String(!estado));
+    btn.setAttribute('aria-expanded', String(estado));
+    btn.setAttribute('aria-label', estado ? 'Fechar menu' : 'Abrir menu');
+  }
+
+  btn.addEventListener('click', function () {
+    abrir(!mega.classList.contains('is-open'));
+  });
+
+  // fecha no Esc
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && mega.classList.contains('is-open')) abrir(false);
+  });
+
+  // fecha ao clicar fora do painel e fora do botão
+  document.addEventListener('click', function (e) {
+    if (!mega.classList.contains('is-open')) return;
+    if (mega.contains(e.target) || btn.contains(e.target)) return;
+    abrir(false);
+  });
+})();
+</script>
+
+</body>
+</html>

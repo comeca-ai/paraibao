@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+*.dump
+*.orig
+*.pre-domain-fix
+*.pem
+letsencrypt/
+certbot/
+conf.d.bak-*/

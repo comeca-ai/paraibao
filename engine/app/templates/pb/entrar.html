@@ -1,0 +1,203 @@
+{# Tela de entrada do painel.
+
+   Server-rendered e sem JavaScript, pela mesma razão da tela da máquina: é o
+   que se abre no celular no meio da rua. Formulário nativo funciona com o
+   gerenciador de senhas do navegador, com o teclado do celular e com a tecla
+   Enter, sem que ninguém precise reimplementar nada disso.
+
+   O painel esquerdo existe por um motivo prático além do estético: no modelo
+   white label é ele que muda de praça para praça. Quem abrir o painel do
+   jornal errado percebe antes de digitar a senha. #}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Entrar — {{ jornal.nome }}</title>
+<link href="/static/fontes.css?v={{ assets_v.fontes }}" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css?v={{ assets_v.css }}">
+<style>
+  body { margin: 0; background: #fff; }
+
+  .ent { min-height: 100vh; display: grid; grid-template-columns: 1.05fr 1fr; }
+
+  /* -------- lado da marca -------- */
+  .ent__marca {
+    background: var(--marca); color: #fff;
+    padding: 46px 52px; display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .ent__logo { display: block; }
+  .ent__logo img { display: block; width: 260px; max-width: 74%; height: auto; }
+  .ent__frase {
+    font-family: "Neue Helvena", Helvetica, Arial, sans-serif;
+    font-size: clamp(26px, 3.1vw, 41px); font-weight: 800; letter-spacing: -.03em;
+    line-height: 1.06; margin: 0; max-width: 12em;
+  }
+  .ent__nota { font-size: 13px; line-height: 1.55; color: rgba(255,255,255,.82); margin: 0; max-width: 34em; }
+  .ent__nota b { color: #fff; font-weight: 700; }
+
+  /* -------- lado do formulário -------- */
+  .ent__lado { display: flex; align-items: center; justify-content: center; padding: 46px 32px; }
+  .ent__caixa { width: 100%; max-width: 372px; }
+  .ent__caixa h1 {
+    font-family: "Neue Helvena", Helvetica, Arial, sans-serif;
+    font-size: 30px; font-weight: 800; letter-spacing: -.028em; margin: 0 0 6px;
+  }
+  .ent__caixa > p.sub { margin: 0 0 26px; font-size: 14px; color: var(--tinta-2); line-height: 1.5; }
+
+  .campo { margin-bottom: 16px; }
+  .campo label {
+    display: block; margin-bottom: 7px;
+    font: 700 10.5px/1 "DM Sans", system-ui, sans-serif;
+    letter-spacing: .085em; text-transform: uppercase; color: var(--tinta-3);
+  }
+  .campo input {
+    width: 100%; box-sizing: border-box; padding: 13px 14px;
+    font: 400 15px/1.2 "DM Sans", system-ui, sans-serif; color: var(--tinta);
+    background: #fff; border: 1px solid var(--fio); border-radius: 0;
+    -webkit-appearance: none; transition: border-color .12s ease, box-shadow .12s ease;
+  }
+  .campo input:focus {
+    outline: none; border-color: var(--marca);
+    box-shadow: inset 0 0 0 1px var(--marca);
+  }
+  .campo input::placeholder { color: #b4b4bd; }
+
+  .botao {
+    width: 100%; padding: 14px 18px; margin-top: 6px; cursor: pointer;
+    font: 700 12px/1 "DM Sans", system-ui, sans-serif;
+    letter-spacing: .09em; text-transform: uppercase;
+    color: #fff; background: var(--marca); border: 0; border-radius: 0;
+    transition: background .12s ease;
+  }
+  .botao:hover { background: #1a3bc4; }
+  .botao--vazio { background: #fff; color: var(--tinta-2); border: 1px solid var(--fio); }
+  .botao--vazio:hover { background: #f7f7f9; color: var(--tinta); }
+
+  /* Aviso: vermelho para erro, cinza para recado. O verde da marca não entra
+     aqui, porque num painel azul o leitor lê cor antes de ler texto. */
+  .aviso {
+    padding: 12px 14px; margin-bottom: 20px; font-size: 13.5px; line-height: 1.5;
+    border-left: 3px solid var(--ponto); background: #fdf0f1; color: #8e0714;
+  }
+  .aviso--neutro { border-left-color: var(--tinta-3); background: #f7f7f9; color: var(--tinta-2); }
+  .aviso--ok { border-left-color: #0f7d3f; background: #eef7f1; color: #0b5c2e; }
+
+  .ent__rodape { margin-top: 26px; font-size: 12.5px; color: var(--tinta-3); line-height: 1.55; }
+  .ent__rodape a { color: var(--tinta-2); text-decoration: underline; text-underline-offset: 2px; }
+
+  .regra { font-size: 12.5px; color: var(--tinta-3); margin: -8px 0 16px; line-height: 1.5; }
+
+  @media (max-width: 860px) {
+    .ent { grid-template-columns: 1fr; min-height: 0; }
+    .ent__marca { padding: 26px 22px 30px; gap: 22px; }
+    .ent__logo img { width: 190px; }
+    .ent__frase { font-size: 27px; }
+    .ent__nota { display: none; }
+    .ent__lado { padding: 34px 22px 60px; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="ent">
+
+  <aside class="ent__marca">
+    <a class="ent__logo" href="{{ jornal.base_url }}">
+      {% if jornal.logo_branca %}
+        <img src="{{ jornal.logo_branca }}?v={{ assets_v.logo }}" alt="{{ jornal.nome }}">
+      {% else %}
+        <span style="font-family:'Neue Helvena',Helvetica,Arial,sans-serif;font-size:40px;font-weight:800;letter-spacing:-.03em;color:#fff">{{ jornal.nome }}</span>
+      {% endif %}
+    </a>
+    <p class="ent__frase">{{ jornal.slogan }}</p>
+    <p class="ent__nota">
+      Área restrita à redação. Cada pessoa entra com a <b>própria conta</b>:
+      é assim que dá para saber quem publicou o quê e tirar o acesso de
+      alguém sem trocar a senha de todo mundo.
+    </p>
+  </aside>
+
+  <main class="ent__lado">
+    <div class="ent__caixa">
+
+      {# ---------- trocar senha obrigatória ---------- #}
+      {% if modo == "trocar" %}
+        <h1>Escolha uma senha</h1>
+        <p class="sub">
+          {% if forcado %}
+            Esta conta ainda usa a senha inicial. Antes de entrar no painel,
+            defina uma que só você conheça.
+          {% else %}
+            Trocar a senha encerra as outras sessões abertas nesta conta.
+          {% endif %}
+        </p>
+
+        {% if erro %}<div class="aviso">{{ erro }}</div>{% endif %}
+        {% if recado %}<div class="aviso aviso--ok">{{ recado }}</div>{% endif %}
+
+        <form method="post" action="/senha">
+          <input type="hidden" name="de" value="{{ de }}">
+          {% if not forcado %}
+          <div class="campo">
+            <label for="atual">Senha atual</label>
+            <input id="atual" name="atual" type="password" autocomplete="current-password" required>
+          </div>
+          {% endif %}
+          <div class="campo">
+            <label for="nova">Nova senha</label>
+            <input id="nova" name="nova" type="password" autocomplete="new-password"
+                   minlength="{{ min_senha }}" required autofocus>
+          </div>
+          <p class="regra">Mínimo de {{ min_senha }} caracteres.</p>
+          <div class="campo">
+            <label for="repetida">Repita a nova senha</label>
+            <input id="repetida" name="repetida" type="password" autocomplete="new-password"
+                   minlength="{{ min_senha }}" required>
+          </div>
+          <button class="botao" type="submit">Salvar e entrar</button>
+        </form>
+
+        <p class="ent__rodape">
+          Entrando como <b>{{ usuario.email }}</b>.
+          <a href="/sair">Sair</a>
+        </p>
+
+      {# ---------- entrada ---------- #}
+      {% else %}
+        <h1>Entrar</h1>
+        <p class="sub">Painel de controle do {{ jornal.nome }}.</p>
+
+        {% if erro %}<div class="aviso">{{ erro }}</div>{% endif %}
+        {% if recado %}<div class="aviso aviso--neutro">{{ recado }}</div>{% endif %}
+
+        <form method="post" action="/entrar">
+          <input type="hidden" name="de" value="{{ de }}">
+          <div class="campo">
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" inputmode="email"
+                   autocomplete="username" value="{{ email_digitado }}"
+                   placeholder="voce@{{ jornal.dominio }}" required
+                   {% if not email_digitado %}autofocus{% endif %}>
+          </div>
+          <div class="campo">
+            <label for="senha">Senha</label>
+            <input id="senha" name="senha" type="password" autocomplete="current-password"
+                   required {% if email_digitado %}autofocus{% endif %}>
+          </div>
+          <button class="botao" type="submit">Entrar</button>
+        </form>
+
+        <p class="ent__rodape">
+          Esqueceu a senha? Não existe recuperação por e-mail ainda: peça a
+          quem administra o painel para gerar uma nova.
+          <br><a href="{{ jornal.base_url }}">Voltar para o jornal</a>
+        </p>
+      {% endif %}
+
+    </div>
+  </main>
+
+</div>
+</body>
+</html>

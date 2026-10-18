@@ -1,0 +1,96 @@
+{
+ "_leia_me": "Perfil de PROVA (Pernambuco). Existe para provar que o motor roda fora da PB sem tocar em .py. Não é cliente.",
+ "identidade": {
+  "nome": "Pernambucão",
+  "dominio": "pernambucao.com.br",
+  "base_url": "https://pernambucao.com.br",
+  "slogan": "Pernambuco na palma da sua mão",
+  "email": "contato@pernambucao.com.br",
+  "hashtag": "#PE",
+  "cor_marca": "#c0392b",
+  "praca": "Recife, Pernambuco",
+  "user_agent": "PernambucaoMonitor/0.1 (+https://pernambucao.com.br)",
+  "logo_marca": null,
+  "logo_branca": null,
+  "og_imagem": null,
+  "painel_host": null
+ },
+ "territorio": {
+  "uf": "PE",
+  "uf_nome": "Pernambuco",
+  "gentilico": "pernambucano",
+  "artigo": "de",
+  "mesorregioes": [
+   "Metropolitana do Recife",
+   "Zona da Mata",
+   "Agreste",
+   "Sertão"
+  ],
+  "municipios": [
+   {
+    "ibge": 2611606,
+    "nome": "Recife",
+    "slug": "recife",
+    "micro": "Recife",
+    "meso": "Metropolitana do Recife",
+    "imediata": "Recife",
+    "aliases": [],
+    "ambiguo": false
+   },
+   {
+    "ibge": 2607901,
+    "nome": "Jaboatão dos Guararapes",
+    "slug": "jaboatao-dos-guararapes",
+    "micro": "Recife",
+    "meso": "Metropolitana do Recife",
+    "imediata": "Recife",
+    "aliases": [
+     "Jaboatão"
+    ],
+    "ambiguo": false
+   },
+   {
+    "ibge": 2604106,
+    "nome": "Caruaru",
+    "slug": "caruaru",
+    "micro": "Vale do Ipojuca",
+    "meso": "Agreste",
+    "imediata": "Caruaru",
+    "aliases": [],
+    "ambiguo": false
+   },
+   {
+    "ibge": 2609600,
+    "nome": "Petrolina",
+    "slug": "petrolina",
+    "micro": "Petrolina",
+    "meso": "Sertão",
+    "imediata": "Petrolina",
+    "aliases": [],
+    "ambiguo": false
+   }
+  ]
+ },
+ "fontes": [],
+ "previsao": [
+  {
+   "nome": "Recife",
+   "slug": "recife",
+   "lat": -8.0476,
+   "lon": -34.877
+  },
+  {
+   "nome": "Caruaru",
+   "slug": "caruaru",
+   "lat": -8.2828,
+   "lon": -35.9758
+  },
+  {
+   "nome": "Petrolina",
+   "slug": "petrolina",
+   "lat": -9.3891,
+   "lon": -40.503
+  }
+ ],
+ "dominios_imagem_extra": []
+}

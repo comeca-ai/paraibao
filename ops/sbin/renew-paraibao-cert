@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+docker run --rm \
+  -v /srv/paraibao-gateway/letsencrypt:/etc/letsencrypt \
+  -v /srv/paraibao-gateway/certbot:/var/www/certbot \
+  certbot/certbot:latest renew --webroot -w /var/www/certbot --quiet
+
+docker exec paraibao-gateway nginx -s reload
+

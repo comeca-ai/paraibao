@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}Paraibão{% endblock %}</title>
+<meta name="description" content="{% block descricao %}Notícias dos 223 municípios da Paraíba.{% endblock %}">
+<link rel="canonical" href="{{ base_url }}{{ caminho }}">
+<meta property="og:site_name" content="Paraibão">
+<meta property="og:type" content="{% block og_tipo %}website{% endblock %}">
+<meta property="og:title" content="{{ self.titulo() }}">
+<meta property="og:description" content="{{ self.descricao() }}">
+<meta property="og:url" content="{{ base_url }}{{ caminho }}">
+{% block og_extra %}{% endblock %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+{% block jsonld %}{% endblock %}
+<style>
+:root{--vermelho:#AA0920;--carvao:#1A1917;--areia:#E8E2DA;--branco:#FDFCFA;--cinza:#6B6862;--linha:#DDD6CC}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--branco);color:var(--carvao);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+header{background:var(--carvao);color:var(--areia);position:sticky;top:0;z-index:20}
+.topo{display:flex;align-items:center;gap:28px;height:62px}
+.marca{font-weight:700;font-size:22px;letter-spacing:-.02em;color:#fff;white-space:nowrap}
+.marca span{color:var(--vermelho)}
+nav{display:flex;gap:20px;flex:1;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav a{font-size:14px;font-weight:500;opacity:.82;white-space:nowrap;padding:4px 0;border-bottom:2px solid transparent}
+nav a:hover,nav a.on{opacity:1;border-color:var(--vermelho)}
+.busca{display:flex;gap:0;flex-shrink:0}
+.busca input{border:0;border-radius:3px 0 0 3px;padding:7px 11px;font:inherit;font-size:13px;width:150px;background:#2A2825;color:var(--areia)}
+.busca input::placeholder{color:#8A857D}
+.busca button{border:0;background:var(--vermelho);color:#fff;padding:7px 13px;border-radius:0 3px 3px 0;font:inherit;font-size:13px;font-weight:500;cursor:pointer}
+
+.cabeca{padding:34px 0 22px;border-bottom:2px solid var(--carvao);margin-bottom:26px}
+.cabeca h1{font-size:34px;font-weight:700;letter-spacing:-.025em;line-height:1.15}
+.cabeca p{color:var(--cinza);margin-top:7px;font-size:15px}
+.chapeu{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--vermelho);margin-bottom:7px}
+
+.grade{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;align-items:start}
+.grade.dupla{grid-template-columns:repeat(2,1fr)}
+article.card{border-bottom:1px solid var(--linha);padding-bottom:20px}
+article.card a.alvo{display:block}
+article.card a.alvo:hover h2{color:var(--vermelho)}
+.thumb{aspect-ratio:16/9;width:100%;object-fit:cover;background:var(--areia);border-radius:3px;margin-bottom:11px;display:block}
+article.card h2{font-size:17px;font-weight:700;letter-spacing:-.015em;line-height:1.3;transition:color .12s}
+.grade.dupla article.card h2{font-size:21px}
+article.card p{color:var(--cinza);font-size:14px;margin-top:7px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.meta{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:11px;font-size:12px;color:var(--cinza)}
+.tag{background:var(--areia);padding:2px 8px;border-radius:2px;font-weight:500;color:var(--carvao)}
+.tag.local{background:var(--vermelho);color:#fff}
+.fonte-marca{font-weight:500}
+article.card h2 .sai{font-size:.72em;opacity:.5;font-weight:400;vertical-align:.12em;margin-left:3px}
+
+.secao{margin:42px 0}
+.secao-topo{display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid var(--carvao);padding-bottom:9px;margin-bottom:20px}
+.secao-topo h2{font-size:19px;font-weight:700;letter-spacing:-.015em}
+.secao-topo a{font-size:13px;color:var(--vermelho);font-weight:500}
+
+.colunas{display:grid;grid-template-columns:2fr 1fr;gap:40px;align-items:start}
+.cronologico li{list-style:none;border-bottom:1px solid var(--linha);padding:11px 0}
+.cronologico .hora{font-size:12px;color:var(--vermelho);font-weight:700;display:block}
+.cronologico h3{font-size:15px;font-weight:500;line-height:1.35;margin-top:2px}
+.cronologico a:hover h3{color:var(--vermelho)}
+
+.nuvem{display:flex;flex-wrap:wrap;gap:7px}
+.nuvem a{background:var(--areia);padding:5px 11px;border-radius:2px;font-size:13px;font-weight:500}
+.nuvem a:hover{background:var(--vermelho);color:#fff}
+.nuvem a b{opacity:.55;font-weight:400;font-size:11px}
+
+.vazio{padding:52px 20px;text-align:center;color:var(--cinza);background:var(--areia);border-radius:3px}
+.vazio strong{display:block;color:var(--carvao);font-size:17px;margin-bottom:5px}
+.paginacao{display:flex;gap:11px;justify-content:center;margin:38px 0}
+.paginacao a{padding:9px 17px;border:1px solid var(--linha);border-radius:3px;font-size:14px;font-weight:500}
+.paginacao a:hover{border-color:var(--carvao)}
+
+footer{background:var(--carvao);color:var(--areia);margin-top:64px;padding:38px 0}
+footer .wrap{display:flex;flex-wrap:wrap;gap:26px;justify-content:space-between;font-size:13px}
+footer a{opacity:.75}footer a:hover{opacity:1}
+footer .aviso{max-width:520px;opacity:.6;line-height:1.6}
+
+@media(max-width:900px){.grade{grid-template-columns:repeat(2,1fr)}.colunas{grid-template-columns:1fr}}
+@media(max-width:620px){
+ .grade,.grade.dupla{grid-template-columns:1fr}
+ .topo{height:auto;padding:11px 0;flex-wrap:wrap;gap:11px}
+ nav{order:3;width:100%;flex:none}
+ .busca{flex:1}.busca input{width:100%}
+ .cabeca h1{font-size:26px}
+}
+</style>
+</head>
+<body>
+<header>
+ <div class="wrap topo">
+  <a href="/" class="marca">PARAIB<span>ÃO</span></a>
+  <nav>
+   <a href="/ultimas" {% if secao=='ultimas' %}class="on"{% endif %}>Últimas</a>
+   {% for ed in editorias_nav %}
+   <a href="/editoria/{{ ed.slug }}" {% if secao=='editoria:'+ed.slug %}class="on"{% endif %}>{{ ed.rotulo }}</a>
+   {% endfor %}
+   <a href="/municipios" {% if secao=='municipios' %}class="on"{% endif %}>Municípios</a>
+  </nav>
+  <form class="busca" action="/busca" method="get">
+   <input type="search" name="q" placeholder="Buscar" value="{{ q or '' }}" aria-label="Buscar notícias">
+   <button type="submit">Ir</button>
+  </form>
+ </div>
+</header>
+
+<main class="wrap">
+{% block conteudo %}{% endblock %}
+</main>
+
+<footer>
+ <div class="wrap">
+  <div>
+   <div class="marca" style="font-size:18px">PARAIB<span>ÃO</span></div>
+   <p style="opacity:.6;margin-top:7px">Notícias dos 223 municípios da Paraíba.</p>
+  </div>
+  <div class="aviso">
+   As matérias assinaladas com ↗ são chamadas para o veículo de origem, com
+   crédito e link para a publicação original. O texto integral pertence a quem
+   apurou.
+  </div>
+  <div>
+   <a href="/municipios">Municípios</a> &nbsp;
+   <a href="/sitemap.xml">Sitemap</a>
+  </div>
+ </div>
+</footer>
+</body>
+</html>

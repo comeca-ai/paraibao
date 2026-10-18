@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PF e Receita Federal apreendem meia tonelada de drogas em João Pessoa — Paraibão</title>
+<meta name="description" content="Operação conjunta cumpriu mandados em três bairros da capital e apreendeu material que seria distribuído no litoral paraibano durante a alta temporada.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="./css2%3Ffamily=Anton&amp;family=DM+Sans:wght@400%3B500%3B700&amp;display=swap.css" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script>
+  // define o tema antes de pintar, senao pisca claro antes de virar escuro
+  (function () {
+    var t = localStorage.getItem('paraibao-tema');
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-tema', t);
+  })();
+</script>
+</head>
+<body>
+
+<!-- ============================ 1 · HEADER ============================ -->
+<header class="topbar">
+  <div class="topbar__cell topbar__cell--logo">
+    <a href="index.html"><img src="img/logo.svg" alt="Paraibão"></a>
+  </div>
+  <div class="topbar__espaco"></div>
+  <button class="topbar__cell topbar__cell--icon topbar__botao" aria-label="Buscar">
+    <span class="topbar__rotulo rotulo">Buscar</span>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <circle cx="11" cy="11" r="7.2" stroke="currentColor" stroke-width="2.6"/>
+      <path d="m20 20-3.9-3.9" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button class="topbar__cell topbar__cell--icon topbar__botao" id="btn-tema" aria-label="Mudar para o tema escuro">
+    <span class="topbar__rotulo rotulo" data-claro="Tema escuro" data-escuro="Tema claro">Tema escuro</span>
+    <svg class="tema__icone tema__icone--lua" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+    </svg>
+    <svg class="tema__icone tema__icone--sol" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.9"/>
+      <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button class="topbar__cell topbar__cell--icon topbar__botao" id="btn-menu"
+          aria-expanded="false" aria-controls="mega" aria-label="Abrir menu">
+    <span class="topbar__rotulo rotulo" data-abrir="Abrir menu" data-fechar="Fechar menu">Abrir menu</span>
+    <span class="burger"><span></span><span></span><span></span></span>
+  </button>
+</header>
+
+<!-- ====================== MENU EXPANDIDO ====================== -->
+<div class="mega" id="mega" aria-hidden="true">
+  <div class="mega__inner">
+    <div class="mega__grade">
+
+      <nav class="mega__col">
+        <span class="rotulo rotulo--vermelho">Editorias</span>
+        <a href="materia.html#"><span class="display">Segurança</span><em>4.072</em></a>
+        <a href="materia.html#"><span class="display">Município</span><em>4.345</em></a>
+        <a href="materia.html#"><span class="display">Política</span><em>2.421</em></a>
+        <a href="materia.html#"><span class="display">Economia</span><em>1.660</em></a>
+        <a href="materia.html#"><span class="display">Educação</span><em>1.008</em></a>
+      </nav>
+
+      <nav class="mega__col">
+        <span class="rotulo rotulo--vermelho">Mais no Paraibão</span>
+        <a href="materia.html#"><span class="display">Esportes</span><em>6.216</em></a>
+        <a href="materia.html#"><span class="display">Entretenimento</span><em>4.148</em></a>
+        <a href="materia.html#"><span class="display">Saúde</span><em>2.672</em></a>
+        <a href="materia.html#"><span class="display">Ciência e Tecnologia</span><em>3.119</em></a>
+        <a href="materia.html#"><span class="display">Empresas</span><em>novo</em></a>
+      </nav>
+
+      <div class="mega__col mega__col--cidades">
+        <span class="rotulo rotulo--vermelho">Por cidade</span>
+        <a href="materia.html#"><span class="display">João Pessoa</span></a>
+        <a href="materia.html#"><span class="display">Campina Grande</span></a>
+        <a href="materia.html#"><span class="display">Sertão</span></a>
+        <a href="materia.html#"><span class="display">Litoral</span></a>
+        <div class="mega__sociais">
+          <a href="materia.html#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.9" stroke="currentColor" stroke-width="1.7"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor"/></svg></a>
+          <a href="materia.html#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.6 8.6h2.1V5.7h-2.5c-2.2 0-3.5 1.3-3.5 3.5v1.9H8.4v2.9h2.3V21h3v-7h2.3l.4-2.9h-2.7V9.7c0-.7.3-1.1.9-1.1z" fill="currentColor"/></svg></a>
+          <a href="materia.html#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.6" y="5.6" width="18.8" height="12.8" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10.5 9.5 15 12l-4.5 2.5v-5z" fill="currentColor"/></svg></a>
+          <a href="materia.html#" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8.1 18.7L4 20z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+
+      <article class="mega__destaque">
+        <span class="rotulo mega__badge">Agora</span>
+        <h3 class="display">PF e Receita Federal apreendem meia tonelada de drogas</h3>
+        <img src="img/pf.jpg" alt="">
+        <a class="mega__botao rotulo" href="materia.html#">Ler matéria →</a>
+      </article>
+
+    </div>
+  </div>
+</div>
+
+<main class="corpo">
+
+  <nav class="trilha">
+    <a href="/">Início</a>
+    <span>/</span>
+    <a href="materia.html#">Segurança</a>
+  </nav>
+
+  <article class="bloco">
+
+    <div class="materia__topo">
+    <header class="materia__cabecalho">
+      <div class="dobra__meta">
+        <span class="chip rotulo">Segurança</span>
+        <span class="rotulo">28 de julho de 2026 · 14h12</span>
+      </div>
+
+      <h1 class="display materia__titulo">PF e Receita Federal apreendem meia tonelada de drogas em João Pessoa</h1>
+
+      <p class="materia__olho">Operação conjunta cumpriu mandados em três bairros da capital e apreendeu material que seria distribuído no litoral paraibano durante a alta temporada.</p>
+
+      <div class="assinatura">
+        <div class="assinatura__quem">
+          <b>Redação Paraibão</b><span>·</span><span>Atualizado há 40 minutos</span><span>·</span><span>15 min de leitura</span>
+        </div>
+        <div class="compartilhar">
+          <span class="rotulo">Compartilhar</span>
+          <a href="materia.html#" aria-label="WhatsApp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 20l1.3-3.9A8 8 0 1 1 8.1 18.7L4 20z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="materia.html#" aria-label="X">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </a>
+          <a href="materia.html#" aria-label="Copiar link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 1 0-5.7-5.7L11.5 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 1 0 5.7 5.7l1.5-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <figure class="materia__figura">
+      <img src="img/pf.jpg" alt="Agentes da Polícia Federal durante a operação em João Pessoa">
+      <figcaption>Agentes da Polícia Federal durante a operação no distrito industrial de João Pessoa. Foto: Divulgação/PF</figcaption>
+    </figure>
+    </div>
+
+    <div class="materia__corpo">
+      <div class="texto">
+        <p>A Polícia Federal e a Receita Federal deflagraram na manhã desta segunda-feira uma operação conjunta que resultou na apreensão de aproximadamente 480 quilos de entorpecentes em João Pessoa. A carga estava escondida em um galpão no distrito industrial da capital, dentro de caixas identificadas como material de construção.</p>
+
+        <p>Segundo as investigações, o material seria distribuído em cidades do litoral paraibano durante a alta temporada. Três pessoas foram detidas para prestar esclarecimentos e devem responder por tráfico de drogas e associação criminosa.</p>
+
+        <h2 class="display">Como a carga foi localizada</h2>
+
+        <p>O rastreamento começou há cerca de dois meses, a partir da análise de notas fiscais que não correspondiam ao volume transportado. A Receita Federal identificou divergências no peso declarado e acionou a Polícia Federal, que passou a monitorar o galpão.</p>
+
+        <blockquote>
+          A apreensão desta segunda é a maior do ano no estado e representa um golpe relevante na logística de distribuição no litoral.
+          <cite>Delegado responsável pela operação</cite>
+        </blockquote>
+
+        <p>Os mandados foram cumpridos em três bairros da capital. Além dos entorpecentes, foram apreendidos dois veículos, documentos e aparelhos celulares que serão periciados nos próximos dias.</p>
+
+        <h2 class="display">O que acontece agora</h2>
+
+        <p>A operação segue em andamento e novos mandados podem ser cumpridos, de acordo com a corporação. Os detidos passaram por audiência de custódia e o material apreendido foi encaminhado para perícia.</p>
+
+        <p>A Polícia Federal informou que o valor estimado da carga ultrapassa R$ 12 milhões no mercado ilegal e que a investigação deve identificar outros integrantes do grupo.</p>
+
+        <div class="tags">
+          <a href="materia.html#">Polícia Federal</a>
+          <a href="materia.html#">João Pessoa</a>
+          <a href="materia.html#">Receita Federal</a>
+          <a href="materia.html#">Tráfico</a>
+          <a href="materia.html#">Segurança</a>
+        </div>
+      </div>
+
+      <aside class="lateral">
+        <div class="lateral__titulo">Leia também</div>
+        <article class="lateral__item">
+          <img src="img/caixa.jpg" alt="">
+          <div class="texto-col">
+            <span class="rotulo rotulo--vermelho">Segurança</span>
+            <h3 class="display">Ladrão invade agência, entala na porta giratória e acaba preso</h3>
+          </div>
+        </article>
+        <article class="lateral__item">
+          <img src="img/caminhao.jpg" alt="">
+          <div class="texto-col">
+            <span class="rotulo rotulo--vermelho">Município</span>
+            <h3 class="display">Colisão entre caminhões deixa vítima presa na BR-230</h3>
+          </div>
+        </article>
+        <article class="lateral__item">
+          <img src="img/ufpb.jpg" alt="">
+          <div class="texto-col">
+            <span class="rotulo rotulo--vermelho">Educação</span>
+            <h3 class="display">UFPB aprova dois novos cursos superiores para 2026</h3>
+          </div>
+        </article>
+
+        <div class="lateral__titulo">Mais lidas</div>
+        <article class="lateral__item"><span class="display lateral__numero">01</span><div class="texto-col"><h3 class="display">Enem: Campina Grande tem passagem de ônibus gratuita</h3></div></article>
+        <article class="lateral__item"><span class="display lateral__numero">02</span><div class="texto-col"><h3 class="display">Copa do Mundo 2026: veja as seleções já classificadas</h3></div></article>
+        <article class="lateral__item"><span class="display lateral__numero">03</span><div class="texto-col"><h3 class="display">Quatro trechos de praias estão impróprios para banho</h3></div></article>
+      </aside>
+    </div>
+  </article>
+
+  <!-- mais em Segurança -->
+  <section class="bloco">
+    <div class="faixa-secao">
+      <h2 class="display">Mais em Segurança</h2>
+      <a href="materia.html#">Ver tudo &rarr;</a>
+    </div>
+    <div class="grade-4">
+      <article>
+        <img src="img/caixa.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Segurança</span>
+        <h3 class="display">Ladrão invade agência, entala na porta giratória e acaba preso</h3>
+        <p class="resumo">Câmeras registraram a tentativa de fuga. Ele foi detido pela PM ainda dentro da agência.</p>
+        <span class="tempo">8 min</span>
+      </article>
+      <article>
+        <img src="img/pf.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Segurança</span>
+        <h3 class="display">Operação mira organização criminosa ligada ao tráfico</h3>
+        <p class="resumo">Investigação apura lavagem de dinheiro em empresas de fachada na Paraíba e em São Paulo.</p>
+        <span class="tempo">6 min</span>
+      </article>
+      <article>
+        <img src="img/caminhao.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Município</span>
+        <h3 class="display">Colisão entre caminhões deixa vítima presa na BR-230</h3>
+        <p class="resumo">Os bombeiros levaram cerca de duas horas para retirar o motorista das ferragens.</p>
+        <span class="tempo">4 min</span>
+      </article>
+      <article>
+        <img src="img/chio.jpg" alt="">
+        <span class="rotulo rotulo--vermelho">Política</span>
+        <h3 class="display">Deputado entra no rodízio de suplentes do Rede</h3>
+        <p class="resumo">A cadeira fica com um professor da rede estadual até o fim da legislatura.</p>
+        <span class="tempo">5 min</span>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================ 9 · RODAPÉ ============================ -->
+<footer class="rodape">
+    <div class="rodape__topo">
+      <div class="rodape__marca">
+        <img src="img/logo.svg" alt="Paraibão">
+        <p>As notícias da Paraíba em um só lugar, com apuração local e cobertura diária.</p>
+        <div class="rodape__sociais">
+          <a href="materia.html#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.9" stroke="currentColor" stroke-width="1.7"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor"/></svg></a>
+          <a href="materia.html#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.6 8.6h2.1V5.7h-2.5c-2.2 0-3.5 1.3-3.5 3.5v1.9H8.4v2.9h2.3V21h3v-7h2.3l.4-2.9h-2.7V9.7c0-.7.3-1.1.9-1.1z" fill="currentColor"/></svg></a>
+          <a href="materia.html#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.6" y="5.6" width="18.8" height="12.8" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10.5 9.5 15 12l-4.5 2.5v-5z" fill="currentColor"/></svg></a>
+          <a href="materia.html#" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8.1 18.7L4 20z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+      <div class="rodape__col">
+        <span class="rotulo rotulo--vermelho">Editorias</span>
+        <a href="materia.html#">Segurança</a><a href="materia.html#">Município</a><a href="materia.html#">Política</a><a href="materia.html#">Esportes</a><a href="materia.html#">Educação</a>
+      </div>
+      <div class="rodape__col">
+        <span class="rotulo rotulo--vermelho">Institucional</span>
+        <a href="materia.html#">Quem somos</a><a href="materia.html#">Expediente</a><a href="materia.html#">Privacidade</a><a href="materia.html#">Anuncie</a>
+      </div>
+      <div class="rodape__col">
+        <span class="rotulo rotulo--vermelho">Mais</span>
+        <a href="materia.html#">Newsletter</a><a href="materia.html#">Vídeos</a><a href="materia.html#">Especiais</a><a href="materia.html#">Contato</a>
+      </div>
+    </div>
+    <div class="rodape__legal">
+      <span>© Paraibão, 2026. Todos os direitos reservados.</span>
+      <span>Feito em João Pessoa, Paraíba</span>
+    </div>
+</footer>
+
+<script>
+(function () {
+
+  // interruptor de tema
+  var btnTema = document.getElementById('btn-tema');
+  if (btnTema) {
+    btnTema.addEventListener('click', function () {
+      var atual = document.documentElement.getAttribute('data-tema') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-tema', atual);
+      localStorage.setItem('paraibao-tema', atual);
+      btnTema.setAttribute('aria-label', atual === 'dark' ? 'Mudar para o tema claro' : 'Mudar para o tema escuro');
+      var rotT = btnTema.querySelector('.topbar__rotulo');
+      if (rotT) rotT.textContent = atual === 'dark' ? rotT.dataset.escuro : rotT.dataset.claro;
+    });
+  }
+
+  var btn  = document.getElementById('btn-menu');
+  var mega = document.getElementById('mega');
+  if (!btn || !mega) return;
+
+  function abrir(estado) {
+    document.documentElement.classList.toggle('menu-aberto', estado);
+    mega.classList.toggle('is-open', estado);
+    mega.setAttribute('aria-hidden', String(!estado));
+    btn.setAttribute('aria-expanded', String(estado));
+    btn.setAttribute('aria-label', estado ? 'Fechar menu' : 'Abrir menu');
+  }
+
+  btn.addEventListener('click', function () {
+    abrir(!mega.classList.contains('is-open'));
+  });
+
+  // fecha no Esc
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && mega.classList.contains('is-open')) abrir(false);
+  });
+
+  // fecha ao clicar fora do painel e fora do botão
+  document.addEventListener('click', function (e) {
+    if (!mega.classList.contains('is-open')) return;
+    if (mega.contains(e.target) || btn.contains(e.target)) return;
+    abrir(false);
+  });
+})();
+</script>
+
+</body>
+</html>

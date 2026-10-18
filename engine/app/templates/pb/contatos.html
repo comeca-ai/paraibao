@@ -1,0 +1,92 @@
+{# Caixa de entrada de quem chegou pelo site. Página do administrador, atrás
+   da mesma senha do /painel.
+
+   Server-rendered de propósito: é uma lista que precisa funcionar de qualquer
+   celular, inclusive no meio da rua, e não vale JavaScript para isso.
+
+   Cada linha traz o atalho de WhatsApp e de e-mail: quem abre essa página
+   abriu para responder alguém, não para admirar tabela. #}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Contatos — {{ jornal.nome }}</title>
+<link href="/static/fontes.css?v={{ assets_v.fontes }}" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css?v={{ assets_v.css }}">
+<style>
+  body { padding: 28px 20px 60px; }
+  .cx { max-width: 1100px; margin: 0 auto; }
+  .cx__topo { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+  .cx h1 { font-family: "Neue Helvena", Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -.024em; margin: 0; }
+  .cx__filtros { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cx__filtros a { font: 700 11px/1 "DM Sans", system-ui, sans-serif; letter-spacing: .07em; text-transform: uppercase; padding: 9px 14px; border: 1px solid var(--fio); color: var(--tinta-2); }
+  .cx__filtros { align-items: center; }
+  .cx__filtros a.on { background: var(--marca); border-color: var(--marca); color: #fff; }
+  .cx__eu { font: 400 12px/1.3 "DM Sans", system-ui, sans-serif; color: var(--tinta-3); }
+  .cx__eu b { color: var(--tinta-2); }
+  .cx__eu a { text-decoration: underline; color: var(--tinta-2); }
+  .cx__item { padding: 18px 0; border-top: 1px solid var(--fio); display: grid; grid-template-columns: 1fr 260px; gap: 24px; }
+  .cx__quem { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .cx__quem b { font-size: 17px; }
+  .cx__tag { font: 700 10px/1 "DM Sans", system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; padding: 5px 8px; color: #fff; }
+  .cx__tag--anuncio { background: var(--marca); }
+  .cx__tag--colaborador { background: #0f7d3f; }
+  .cx__msg { margin: 6px 0 0; font-size: 15px; line-height: 1.55; color: var(--tinta-2); white-space: pre-wrap; }
+  .cx__meta { font-size: 12.5px; color: var(--tinta-3); }
+  .cx__acoes { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .cx__acoes a { font: 700 12px/1 "DM Sans", system-ui, sans-serif; letter-spacing: .05em; text-transform: uppercase; padding: 10px 14px; border: 1px solid var(--fio); width: 100%; text-align: center; }
+  .cx__acoes a:hover { border-color: var(--marca); color: var(--marca); }
+  .cx__vazio { padding: 60px 0; text-align: center; color: var(--tinta-3); }
+  @media (max-width: 760px) { .cx__item { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="cx">
+
+  <div class="cx__topo">
+    <h1>Contatos</h1>
+    <div class="cx__filtros">
+      <a href="/painel/maquina">A máquina</a>
+      {% if eu and eu.papel == "dono" %}<a href="/painel/equipe">Equipe</a>{% endif %}
+      {% if eu %}<span class="cx__eu"><b>{{ eu.nome }}</b> · <a href="/sair">sair</a></span>{% endif %}
+    </div>
+  </div>
+
+  <div class="cx__topo" style="margin-top:-6px">
+    <div class="cx__filtros">
+      <a href="/painel/contatos" class="{{ 'on' if not filtro }}">Todos ({{ totais.todos }})</a>
+      <a href="/painel/contatos?tipo=anuncio" class="{{ 'on' if filtro == 'anuncio' }}">Anunciantes ({{ totais.anuncio }})</a>
+      <a href="/painel/contatos?tipo=colaborador" class="{{ 'on' if filtro == 'colaborador' }}">Quem quer escrever ({{ totais.colaborador }})</a>
+    </div>
+  </div>
+
+  {% for c in contatos %}
+  <div class="cx__item">
+    <div>
+      <div class="cx__quem">
+        <span class="cx__tag cx__tag--{{ c.tipo }}">{{ 'Anúncio' if c.tipo == 'anuncio' else 'Escrever' }}</span>
+        <b>{{ c.nome }}</b>
+        {% if c.empresa %}<span class="cx__meta">· {{ c.empresa }}</span>{% endif %}
+        {% if c.area %}<span class="cx__meta">· {{ c.area }}</span>{% endif %}
+        {% if c.cidade %}<span class="cx__meta">· {{ c.cidade }}</span>{% endif %}
+      </div>
+      <div class="cx__meta">
+        {{ c.quando }} · {{ c.email }} · {{ c.telefone_digitado or c.telefone }}
+        {% if c.link %}· <a href="{{ c.link }}" target="_blank" rel="noopener" style="color:var(--marca)">portfólio</a>{% endif %}
+      </div>
+      <p class="cx__msg">{{ c.mensagem }}</p>
+    </div>
+    <div class="cx__acoes">
+      <a href="https://wa.me/{{ c.telefone }}" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="mailto:{{ c.email }}">E-mail</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="cx__vazio">Nenhum contato ainda.</div>
+  {% endfor %}
+
+</div>
+</body>
+</html>

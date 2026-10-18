@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Paraibão Engine</title>
+  <style>
+    :root{--red:#224ae9;--ink:#171513;--paper:#f3efe8;--line:#cec6bb;--muted:#756e66;--ok:#18794e;--alerta:#b3261e}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
+    header{background:var(--red);color:#fff;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    h1{margin:0;font-size:24px;letter-spacing:-.04em;text-transform:uppercase}header span{opacity:.8}
+    main{max-width:1400px;margin:auto;padding:24px}.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--ink);background:#fff}
+    .stat{padding:22px;border-right:1px solid var(--ink)}.stat:last-child{border:0}.stat b{display:block;font-size:28px}.stat small{text-transform:uppercase;color:var(--muted);font-weight:700}
+    .bar{display:flex;justify-content:space-between;align-items:center;margin:30px 0 12px}.bar h2{margin:0;text-transform:uppercase;font-size:18px}
+    button{border:0;background:var(--ink);color:#fff;padding:11px 16px;font-weight:700;cursor:pointer}button:disabled{opacity:.5}
+    .layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:24px}.feed,.side{border:1px solid var(--ink);background:#fff}
+    article{display:grid;grid-template-columns:110px 1fr;gap:16px;padding:16px;border-bottom:1px solid var(--line)}article:last-child{border:0}
+    article img{width:110px;height:80px;object-fit:cover;background:#ddd}article h3{margin:4px 0 5px;font-size:16px;line-height:1.25}article p{margin:0;color:var(--muted);font-size:12px}.meta{font-size:10px;text-transform:uppercase;color:var(--red);font-weight:800}
+    .source{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}.source:last-child{border:0}.ok{color:var(--ok)}.bad{color:var(--alerta)}
+    .empty{padding:30px;color:var(--muted)}
+    .redes{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+    .rede{border:1px solid var(--ink);background:#fff;padding:18px}
+    .rede h3{margin:0 0 10px;text-transform:uppercase;font-size:14px;letter-spacing:.04em}
+    .rede .num{font-size:26px;font-weight:800}
+    .rede .linha{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12px}
+    .rede .linha:last-child{border:0}
+    .tag{font-size:10px;font-weight:800;text-transform:uppercase;padding:3px 7px;color:#fff;background:var(--muted)}
+    .tag.on{background:var(--ok)}.tag.off{background:var(--alerta)}.tag.dry{background:#8a6d00}
+    .cartoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+    .peca{border:1px solid var(--ink);background:#fff}
+    .peca img{width:100%;display:block;aspect-ratio:4/5;object-fit:cover;background:#ddd}
+    .peca .txt{padding:10px;font-size:11px;color:var(--muted);white-space:pre-wrap;max-height:150px;overflow:auto}
+    @media(max-width:800px){.redes{grid-template-columns:1fr}}
+    @media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--ink)}.layout{grid-template-columns:1fr}article{grid-template-columns:80px 1fr}article img{width:80px;height:70px}}
+  </style>
+</head>
+<body>
+<header><div><h1>Paraibão Engine</h1><span>Central de inteligência editorial · PB</span></div><span id="clock">carregando…</span></header>
+<main>
+  <section class="stats">
+    <div class="stat"><b id="articles">—</b><small>notícias coletadas</small></div>
+    <div class="stat"><b id="sources">—</b><small>fontes</small></div>
+    <div class="stat"><b id="healthy">—</b><small>fontes saudáveis</small></div>
+    <div class="stat"><b id="last">—</b><small>última coleta</small></div>
+  </section>
+  <div class="bar"><h2>Últimas capturas</h2><button id="crawl">Coletar agora</button></div>
+  <div class="layout"><section class="feed" id="feed"><div class="empty">Aguardando a primeira coleta…</div></section><aside><div class="bar" style="margin-top:0"><h2>Fontes</h2></div><div class="side" id="sourceList"></div></aside></div>
+
+  <div class="bar"><h2>Redação própria</h2><span id="iaModo"></span></div>
+  <div class="redes" id="iaResumo"></div>
+  <div id="iaLista"></div>
+
+  <div class="bar"><h2>Máquina de publicação</h2><span id="socialModo"></span></div>
+  <div class="redes" id="redes"></div>
+  <div class="bar"><h2>Peças montadas</h2><span id="socialAviso" style="color:var(--muted);font-size:12px"></span></div>
+  <div class="cartoes" id="pecas"></div>
+</main>
+<script>
+// Sessão vencida devolve 401 em JSON nas rotas de API. Sem isto a tela
+// simplesmente parava de atualizar, sem dizer por quê: o painel parecia
+// quebrado quando o que aconteceu foi só a sessão expirar.
+(function(){
+  const original = window.fetch;
+  window.fetch = async function(...args){
+    const r = await original.apply(this, args);
+    if (r.status === 401) {
+      location.href = '/entrar?de=' + encodeURIComponent(location.pathname);
+      throw new Error('sessão expirada');
+    }
+    return r;
+  };
+})();
+const fmt=v=>v?new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short'}).format(new Date(v)):'—';
+const esc=s=>(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function load(){const r=await fetch('/api/dashboard');if(!r.ok)throw Error('Falha '+r.status);const d=await r.json();
+document.querySelector('#articles').textContent=d.stats.articles;document.querySelector('#sources').textContent=d.stats.sources;document.querySelector('#healthy').textContent=d.stats.healthy_sources;document.querySelector('#last').textContent=fmt(d.stats.last_run);document.querySelector('#clock').textContent='Atualizado '+new Date().toLocaleTimeString('pt-BR');
+document.querySelector('#feed').innerHTML=d.articles.length?d.articles.map(a=>`<article>${a.image_url?`<img src="${esc(a.image_url)}" alt="" loading="lazy">`:'<div></div>'}<div><span class="meta">${esc(a.source)} · ${fmt(a.published_at||a.collected_at)}</span><h3><a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${esc(a.title)}</a></h3><p>${esc((a.summary||'').slice(0,220))}</p></div></article>`).join(''):'<div class="empty">Aguardando a primeira coleta…</div>';
+document.querySelector('#sourceList').innerHTML=d.sources.map(s=>`<div class="source"><div><b>${esc(s.name)}</b><br><small>${fmt(s.last_success_at)}</small></div><b class="${s.last_error?'bad':'ok'}">${s.last_error?'falha':'online'}</b></div>`).join('');}
+document.querySelector('#crawl').onclick=async e=>{e.target.disabled=true;e.target.textContent='Na fila…';await fetch('/api/crawl',{method:'POST'});setTimeout(async()=>{await load();e.target.disabled=false;e.target.textContent='Coletar agora'},6000)};
+
+const NOME={instagram:'Instagram',facebook:'Página do Facebook'};
+async function loadSocial(){
+  const r=await fetch('/api/social');if(!r.ok)return;const d=await r.json();
+  const c=d.credenciais, falta=Object.entries(c).filter(([,v])=>!v).map(([k])=>k);
+  document.querySelector('#socialModo').innerHTML=
+    `<span class="tag ${d.modo==='on'?'on':d.modo==='dry'?'dry':'off'}">modo ${esc(d.modo)}</span> `+
+    `<span style="color:var(--muted);font-size:12px">card ${esc(d.layout)} · ${esc(d.janela)} · ${d.intervalo_min} min entre posts`+
+    (falta.length?` · <b class="bad">falta credencial: ${falta.join(', ')}</b>`:'')+`</span>`;
+
+  document.querySelector('#redes').innerHTML=Object.entries(d.redes).map(([rede,s])=>`
+    <div class="rede">
+      <h3>${NOME[rede]||rede}</h3>
+      <div class="num">${s.hoje}<span style="font-size:14px;color:var(--muted)">/${s.teto} hoje</span></div>
+      <div class="linha"><span>Estado</span><b class="${s.liberado?'ok':''}">${s.liberado?'pronta para publicar':esc(s.motivo)}</b></div>
+      <div class="linha"><span>Último post</span><b>${fmt(s.ultimo_em)}</b></div>
+      <div class="linha"><span>Total já publicado</span><b>${s.total}</b></div>
+      <div class="linha"><span>Próxima da fila</span><b style="text-align:right">${esc((s.proxima||'nada elegível').slice(0,80))}</b></div>
+      <button style="margin-top:12px" data-rede="${rede}">Publicar agora</button>
+    </div>`).join('');
+
+  document.querySelectorAll('#redes .rede button').forEach(b=>b.onclick=async e=>{
+    const btn=e.target;btn.disabled=true;btn.textContent='Publicando…';
+    const res=await (await fetch('/api/social/publicar?rede='+btn.dataset.rede,{method:'POST'})).json();
+    document.querySelector('#socialAviso').textContent=res.publicado
+      ? `Publicado (${res.status}).` : `Não publicou: ${res.motivo||res.error||'sem matéria elegível'}`;
+    await loadSocial();
+  });
+
+  document.querySelector('#pecas').innerHTML=d.posts.length?d.posts.map(p=>`
+    <div class="peca">
+      ${p.card?`<img src="${esc(p.card)}" alt="" loading="lazy">`:''}
+      <div class="txt"><b>${esc(p.network)} · ${esc(p.status)}</b>${p.error?`\n<span class="bad">${esc(p.error)}</span>`:''}
+${esc(p.caption||'')}</div>
+    </div>`).join(''):'<div class="empty">Nenhuma peça montada ainda.</div>';
+}
+
+async function loadIA(){
+  const r=await fetch('/api/redator');if(!r.ok)return;const d=await r.json();
+  document.querySelector('#iaModo').innerHTML=
+    `<span class="tag ${d.configurado?'on':'off'}">${esc(d.provedor)}</span> `+
+    `<span style="color:var(--muted);font-size:12px">${esc(d.modelo)}`+
+    (d.configurado?'':' · <b class="bad">falta a chave da API</b>')+`</span>`;
+
+  const custo = d.custo_usd < 0.01 && d.custo_usd > 0 ? '< US$ 0,01' : 'US$ '+d.custo_usd.toFixed(2);
+  document.querySelector('#iaResumo').innerHTML=`
+    <div class="rede">
+      <h3>Conversão para texto próprio</h3>
+      <div class="num">${d.proprias}<span style="font-size:14px;color:var(--muted)"> de ${d.tentadas} tentadas</span></div>
+      <div class="linha"><span>Aproveitamento</span><b>${d.aproveitamento}%</b></div>
+      <div class="linha"><span>Cota do dia</span><b>${d.usadas_24h}/${d.teto_dia}</b></div>
+      <div class="linha"><span>Tokens (entrada / saída)</span><b>${d.tokens_entrada.toLocaleString('pt-BR')} / ${d.tokens_saida.toLocaleString('pt-BR')}</b></div>
+      <div class="linha"><span>${d.neuronios_franquia?'Franquia de hoje':'Custo acumulado'}</span><b>${
+        d.neuronios_franquia
+          ? d.neuronios_24h.toLocaleString('pt-BR')+' / '+d.neuronios_franquia.toLocaleString('pt-BR')+' neurônios'
+          : (d.provedor==='gemini'?'gratuito':custo)}</b></div>
+      <button style="margin-top:12px" id="iaRodar">Reescrever uma agora</button>
+    </div>
+    <div class="rede">
+      <h3>Por que algumas são recusadas</h3>
+      ${d.motivos_de_recusa.length
+        ? d.motivos_de_recusa.map(m=>`<div class="linha"><span style="max-width:78%">${esc(m.motivo)}</span><b>${m.total}</b></div>`).join('')
+        : '<div class="linha"><span>Nenhuma recusa registrada</span></div>'}
+      <p style="font-size:11px;color:var(--muted);margin:12px 0 0">
+        A reescrita é descartada quando inventa número que não está na origem,
+        quando repete trechos literais ou quando o material não dá notícia.
+        Nesses casos a matéria continua como agregada.</p>
+    </div>`;
+
+  document.querySelector('#iaRodar').onclick=async e=>{
+    e.target.disabled=true;e.target.textContent='Escrevendo…';
+    const res=await (await fetch('/api/redator/rodar?quantas=1',{method:'POST'})).json();
+    if(!res.convertidas) alert('Não reescreveu: '+(res.motivo||'sem motivo informado'));
+    await loadIA();
+  };
+
+  document.querySelector('#iaLista').innerHTML=d.recentes.length?`
+    <div class="feed" style="margin-top:16px">
+      ${d.recentes.map(a=>`<article style="grid-template-columns:1fr">
+        <div>
+          <span class="meta">era: ${esc(a.titulo_origem)}</span>
+          <h3><a href="${esc(a.url||'#')}" target="_blank" rel="noopener">${esc(a.titulo_proprio)}</a></h3>
+          <p>${esc(a.olho||'')}</p>
+        </div></article>`).join('')}
+    </div>`:'';
+}
+
+function tudo(){return Promise.all([load(),loadSocial(),loadIA()])}
+tudo().catch(e=>document.querySelector('#feed').innerHTML='<div class="empty">'+esc(e.message)+'</div>');setInterval(tudo,30000);
+</script>
+</body></html>
+

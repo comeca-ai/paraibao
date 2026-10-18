@@ -1,0 +1,2 @@
+23 2,14 * * * root /usr/local/sbin/renew-paraibao-cert >> /var/log/paraibao-cert-renew.log 2>&1
+

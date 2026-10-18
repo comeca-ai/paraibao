@@ -1,0 +1,1041 @@
+/* ============================================================
+   Paraibão · Home
+   Estilo brutalista editorial. Borda preta como estrutura,
+   cor da marca só como marcador.
+
+   A marca tem duas versões da mesma cor, e qual entra depende do
+   fundo, não do gosto: a cheia sobre superfície clara, a clara
+   sobre superfície escura. Por isso é uma variável só, que
+   troca de valor junto com o tema.
+   ============================================================ */
+
+:root {
+  /* tema claro */
+  /* A marca tem dois papéis, e eles não são a mesma variável:
+       --marca        superfície (bloco do logo, chip, faixa) — igual nos dois temas
+       --marca-tinta  a marca usada COMO TEXTO — segue o fundo embaixo dela
+     O azul cheio sobre fundo escuro dá 2,8:1 e não se lê; por isso onde a
+     superfície é escura a tinta troca para a versão clara. */
+  --marca: #224ae9;
+  --marca-clara: #7d94f2;
+  --marca-tinta: var(--marca);
+  --base:     #f0f0f0;   /* fundo geral */
+  --branco:   #fcfcfc;   /* barra do topo */
+  --preto:    #12100f;   /* tinta: texto e bordas */
+  --escuro:   #12100f;   /* superficies escuras: rodape, menu, jogo */
+  --creme:    #f5f1e8;   /* faixa do ticker */
+  --cinza:    #6b6866;
+  --foto:     #c7c2ba;
+
+  --linha:    #12100f;   /* traco das divisorias, separado da tinta do texto */
+
+  /* tinta que vive EM CIMA da cor da marca. Muda com o tema, porque no
+     escuro a marca é o verde claro e creme sobre ele não se lê (1,35:1). */
+  --sobre-marca: #f5f1e8;
+  --sobre-escuro:   #f0f0f0;
+  --linha-clara:    rgba(240, 240, 240, .3);
+
+  --borda: 1px solid var(--linha);
+  --borda-clara: 1px solid var(--linha-clara);
+  --gap: 24px;
+  --max: 1440px;
+}
+
+:root[data-tema="dark"] {
+  --marca-tinta: var(--marca-clara);
+  --base:     #171613;
+  --branco:   #1e1c19;
+  --preto:    #ece8e1;
+  --escuro:   #211e1a;
+  --creme:    #221f1b;
+  --cinza:    #a09a91;
+  --foto:     #3a3733;
+  /* linha clara sobre fundo escuro irradia e parece mais grossa;
+     por isso ela recua de contraste em vez de mudar de espessura */
+  --linha:    #423d37;
+}
+
+/* Blocos escuros nos dois temas. A tinta da marca dentro deles é sempre a
+   clara, senão o azul cheio desaparece no fundo escuro do tema claro. */
+.mega, .rodape, .jogo { --marca-tinta: var(--marca-clara); }
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--base);
+  color: var(--preto);
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+
+/* ============================================================
+   Neue Helvena · Zippie Letras · subconjunto latino em woff2
+   ============================================================ */
+@font-face {
+  font-family: "Neue Helvena";
+  src: url("fonts/NeueHelvena-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Helvena";
+  src: url("fonts/NeueHelvena-Extrabold.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- tipografia ---------- */
+.display {
+  font-family: "Neue Helvena", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+  margin: 0;
+}
+/* a manchete principal ganha o peso mais alto */
+.dobra__titulo, .materia__titulo { font-weight: 800; }
+.rotulo {
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.rotulo--marca { color: var(--marca-tinta); }
+.resumo { color: var(--cinza); font-size: 12px; line-height: 1.5; margin: 0; }
+.tempo  { color: var(--cinza); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+/* ============================================================
+   1 · Header
+   ============================================================ */
+.topbar {
+  display: flex;
+  align-items: stretch;
+  min-height: 80px;
+  background: var(--branco);
+  border-top: var(--borda);
+  border-bottom: var(--borda);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.topbar__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  background: var(--base);
+  border-right: var(--borda);
+}
+.topbar__cell--logo {
+  background: var(--marca);
+  flex: 0 0 auto;
+}
+.topbar__cell--logo img { width: 166px; height: 36px; }
+
+/* o vão entre o logo e os botões, sem borda própria */
+.topbar__espaco { flex: 1 1 auto; background: var(--base); border-right: var(--borda); }
+
+.topbar__cell--icon { flex: 0 0 auto; padding: 0 28px; gap: 14px; }
+.topbar__cell:last-child { border-right: 0; }
+
+.topbar__botao {
+  font: inherit;
+  color: var(--preto);
+  border-top: 0; border-bottom: 0; border-left: 0;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: background .22s ease, color .22s ease;
+}
+
+/* O botão cresce revelando o rótulo. Animo a largura do rótulo, e não a do
+   botão, porque assim ele se ajusta sozinho ao texto e não depende de número
+   mágico. O ícone fica ancorado à direita e o texto entra por trás dele. */
+.topbar__rotulo {
+  display: block;
+  max-width: 0;
+  margin-right: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateX(10px);
+  transition:
+    max-width   .42s cubic-bezier(.33, 1, .68, 1),
+    margin-right .42s cubic-bezier(.33, 1, .68, 1),
+    transform   .42s cubic-bezier(.33, 1, .68, 1),
+    opacity     .26s ease .06s;
+}
+@media (hover: hover) and (pointer: fine) {
+.topbar__botao:hover .topbar__rotulo,
+.topbar__botao:focus-visible .topbar__rotulo {
+  max-width: 160px;
+  margin-right: 12px;
+  opacity: 1;
+  transform: none;
+}
+}
+
+/* com o menu aberto o rótulo fica sempre visível, senão o "Fechar menu" some */
+.menu-aberto #btn-menu .topbar__rotulo {
+  max-width: 160px;
+  margin-right: 12px;
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topbar__rotulo { transition: opacity .2s ease; }
+}
+@media (hover: hover) and (pointer: fine) {
+.topbar__botao:hover { background: var(--marca); color: var(--sobre-marca); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+.topbar__botao:hover .burger span { background: currentColor; }
+}
+
+
+/* hambúrguer que vira X */
+.burger { display: flex; flex-direction: column; justify-content: center; gap: 5px; width: 34px; height: 29px; }
+.burger span {
+  display: block; width: 34px; height: 5px; background: currentColor;
+  transition: transform .32s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
+}
+.menu-aberto .burger span:nth-child(1) { transform: translateY(10px) rotate(45deg); }
+.menu-aberto .burger span:nth-child(2) { opacity: 0; }
+.menu-aberto .burger span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
+
+/* ============================================================
+   Menu expandido
+   ============================================================ */
+.mega {
+  position: sticky;
+  top: 80px;
+  z-index: 19;
+  display: grid;
+  grid-template-rows: 0fr;
+  background: var(--escuro);
+  color: var(--sobre-escuro);
+  transition: grid-template-rows .45s cubic-bezier(.2,.8,.2,1);
+}
+.mega.is-open { grid-template-rows: 1fr; border-bottom: var(--borda); }
+.mega__inner { overflow: hidden; min-height: 0; }
+
+.mega__grade {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 340px);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity .3s ease .1s, transform .3s ease .1s;
+}
+.mega.is-open .mega__grade { opacity: 1; transform: none; }
+
+.mega__col { padding: 32px 28px 36px; display: flex; flex-direction: column; gap: 4px; }
+.mega__col + .mega__col,
+.mega__destaque { border-left: 1px solid rgba(240,240,240,.28); }
+.mega__col > .rotulo { margin-bottom: 14px; }
+
+.mega__col a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(240,240,240,.22);
+  transition: color .16s ease, padding-left .16s ease;
+}
+.mega__col a:last-of-type { border-bottom: 0; }
+.mega__col a .display { font-size: 20px; }
+.mega__col a em {
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  opacity: .55;
+}
+@media (hover: hover) and (pointer: fine) {
+.mega__col a:hover { color: #ff5a70; padding-left: 8px; }
+}
+
+
+.mega__sociais { display: flex; gap: 10px; margin-top: 22px; }
+.mega__sociais a { padding: 0; border: 0; }
+.mega__sociais a {
+  display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px;
+  border: 1px solid rgba(240,240,240,.5);
+  transition: background .16s ease, color .16s ease, border-color .16s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+.mega__sociais a:hover { background: var(--marca); border-color: var(--marca); color: var(--sobre-marca); padding-left: 0; }
+}
+
+.mega__sociais svg { width: 19px; height: 19px; }
+
+.mega__destaque { padding: 32px 28px 36px; display: flex; flex-direction: column; gap: 14px; }
+.mega__badge { align-self: flex-start; padding: 5px 10px; background: var(--marca); color: var(--sobre-marca); }
+.mega__destaque h3 { font-size: 19px; }
+.mega__destaque img { width: 100%; height: 130px; object-fit: cover; }
+.mega__botao {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 11px 18px;
+  background: var(--sobre-escuro);
+  color: var(--escuro);
+  transition: background .16s ease, color .16s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+.mega__botao:hover { background: var(--marca); color: var(--sobre-marca); }
+}
+
+
+/* ============================================================
+   Corpo
+   ============================================================ */
+.corpo {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: var(--gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.bloco {
+  background: var(--base);
+  border: var(--borda);
+}
+
+/* ---------- ticker AGORA ---------- */
+.agora {
+  display: flex;
+  align-items: stretch;
+  background: var(--creme);
+  border: var(--borda);
+  overflow: hidden;
+}
+.agora__selo {
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  background: var(--marca);
+  color: var(--sobre-marca);
+  flex: 0 0 auto;
+  z-index: 2;
+}
+
+/* a pista corta, os dois trilhos rodam colados criando o laço sem emenda */
+.agora__pista { display: flex; flex: 1 1 auto; min-width: 0; overflow: hidden; }
+.agora__trilho {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 10px 14px 20px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  animation: agora-correr 52s linear infinite;
+}
+@media (hover: hover) and (pointer: fine) {
+.agora:hover .agora__trilho { animation-play-state: paused; }
+}
+
+
+@keyframes agora-correr { to { transform: translateX(-100%); } }
+
+.agora__trilho a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .045em;
+  transition: color .16s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+.agora__trilho a:hover { color: var(--marca-tinta); }
+}
+
+.agora__trilho time {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--marca-tinta);
+}
+.agora__ponto { width: 6px; height: 6px; border-radius: 50%; background: var(--marca); flex: 0 0 auto; }
+
+/* quem pede menos movimento vê a faixa parada e rolável na mão */
+@media (prefers-reduced-motion: reduce) {
+  .agora__trilho { animation: none; }
+  .agora__pista { overflow-x: auto; }
+  .agora__trilho[aria-hidden="true"] { display: none; }
+}
+
+/* ---------- faixa de seção ---------- */
+.faixa-secao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 28px;
+  background: var(--marca);
+  color: var(--sobre-marca);
+}
+.faixa-secao h2 { font-size: 23px; }
+.faixa-secao a { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* ============================================================
+   3 · Dobra
+   ============================================================ */
+.dobra { display: grid; grid-template-columns: minmax(0, 900fr) minmax(0, 492fr); }
+.dobra__principal {
+  padding: 32px 36px 0;
+  border-right: var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.dobra__meta { display: flex; align-items: center; gap: 12px; }
+.chip {
+  display: inline-flex;
+  padding: 6px 12px;
+  background: var(--marca);
+  color: var(--sobre-marca);
+}
+.dobra__titulo { font-size: 46px; }
+.dobra__foto { width: 100%; height: 200px; object-fit: cover; background: var(--foto); }
+
+/* os quatro itens dividem a altura da coluna, então não sobra vão morto embaixo */
+.dobra__chamadas { display: flex; flex-direction: column; }
+.chamada {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 22px;
+  min-height: 0;
+}
+.chamada + .chamada { border-top: var(--borda); }
+/* foto larga o bastante pra se enxergar o que ela mostra, sem chegar a metade do card */
+.chamada img {
+  flex: 0 0 42%;
+  width: 42%;
+  aspect-ratio: 3 / 2;
+  height: auto;
+  object-fit: cover;
+  background: var(--foto);
+}
+.chamada__texto { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.chamada h3 { font-size: 16px; }
+
+/* ============================================================
+   Grade de 4 colunas (Em alta / Destaque da semana)
+   ============================================================ */
+.grade-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grade-4 > article { padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+.grade-4 > article + article { border-left: var(--borda); }
+.grade-4 img { width: 100%; height: 176px; object-fit: cover; background: var(--foto); }
+.grade-4 h3 { font-size: 19px; }
+
+/* ============================================================
+   5 · Últimas notícias
+   ============================================================ */
+.ultimas__destaque { display: grid; grid-template-columns: minmax(0, 694fr) minmax(0, 696fr); }
+.ultimas__foto { padding: 28px; }
+.ultimas__foto img { width: 100%; height: 356px; object-fit: cover; background: var(--foto); }
+.ultimas__texto {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+}
+.ultimas__texto h3 { font-size: 31px; }
+.ultimas__texto .resumo { font-size: 14px; }
+
+/* a fileira de baixo das Últimas usa o mesmo card da grade, só com régua no topo */
+.grade-4--continuacao { border-top: var(--borda); }
+
+/* ============================================================
+   6 · Próximo jogo
+   ============================================================ */
+.jogo { background: var(--escuro); color: var(--sobre-escuro); }
+.jogo .faixa-secao { border-bottom: 1px solid var(--marca); }
+.jogo__arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 48px 24px;
+}
+.jogo__confronto { display: flex; align-items: center; gap: 60px; }
+.jogo__time { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.jogo__escudo { width: 104px; height: 104px; border-radius: 50%; background: #9e9c99; }
+.jogo__time span { font-size: 18px; }
+.jogo__vs { font-size: 46px; color: var(--marca-tinta); }
+.jogo__quando {
+  padding: 9px 20px;
+  background: var(--marca);
+  color: var(--sobre-marca);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.jogo__local { font-size: 22px; }
+
+/* ============================================================
+   7 · Vídeos + Tabela
+   ============================================================ */
+.duplo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.duplo__lado + .duplo__lado { border-left: var(--borda); }
+
+.video { display: flex; gap: 18px; padding: 22px 28px; }
+.video + .video { border-top: var(--borda); }
+.video__thumb { position: relative; flex: 0 0 auto; width: 170px; height: 108px; background: var(--foto); }
+.video__thumb::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  border-left: 22px solid var(--preto);
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+}
+.video__texto { display: flex; flex-direction: column; gap: 8px; }
+.video h3 { font-size: 16px; }
+
+.tabela { width: 100%; border-collapse: collapse; }
+.tabela th, .tabela td { padding: 13px 0; text-align: center; }
+.tabela th:first-child, .tabela td:first-child { text-align: left; padding-left: 28px; }
+.tabela th:last-child, .tabela td:last-child { padding-right: 28px; }
+.tabela thead th {
+  background: var(--marca);
+  color: var(--sobre-marca);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.tabela tbody tr + tr td { border-top: var(--borda); }
+.tabela td { font-size: 13px; font-weight: 500; }
+.tabela__time { display: flex; align-items: center; gap: 12px; }
+.tabela__escudo { width: 22px; height: 22px; border-radius: 50%; background: #9e9c99; flex: 0 0 auto; }
+
+/* ============================================================
+   9 · Rodapé
+   ============================================================ */
+/* de ponta a ponta, igual à navbar: sem margem lateral e sem borda externa */
+/* faixa vermelha cheia marcando o comeco do rodape */
+.rodape { background: var(--escuro); color: var(--sobre-escuro); border-top: 10px solid var(--marca); }
+.rodape__topo { display: grid; grid-template-columns: 460px repeat(3, minmax(0, 1fr)); }
+.rodape__marca { padding: 36px 32px; display: flex; flex-direction: column; gap: 18px; border-right: var(--borda-clara); }
+.rodape__marca img { width: 166px; height: 36px; }
+.rodape__marca p { margin: 0; font-size: 13px; opacity: .75; }
+.rodape__sociais { display: flex; gap: 10px; }
+.rodape__sociais a {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(240,240,240,.5);
+  opacity: 1;
+  transition: background .16s ease, color .16s ease, border-color .16s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+.rodape__sociais a:hover { background: var(--marca); border-color: var(--marca); }
+}
+
+.rodape__sociais svg { width: 18px; height: 18px; }
+.rodape__col { padding: 36px 28px; display: flex; flex-direction: column; gap: 12px; }
+.rodape__col + .rodape__col { border-left: var(--borda-clara); }
+.rodape__col a { font-size: 13px; opacity: .8; }
+.rodape__legal {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 32px;
+  border-top: var(--borda-clara);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: .6;
+}
+
+/* ============================================================
+   Responsivo
+   ============================================================ */
+@media (max-width: 1100px) {
+  .dobra, .ultimas__destaque, .duplo { grid-template-columns: minmax(0, 1fr); }
+  .dobra__principal { border-right: 0; border-bottom: var(--borda); }
+  .duplo__lado + .duplo__lado { border-left: 0; border-top: var(--borda); }
+  .grade-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grade-4 > article:nth-child(3) { border-left: 0; }
+  .grade-4 > article:nth-child(n+3) { border-top: var(--borda); }
+  .rodape__topo { grid-template-columns: minmax(0, 1fr); }
+  .rodape__marca { border-right: 0; border-bottom: var(--borda-clara); }
+  .rodape__col + .rodape__col { border-left: 0; border-top: var(--borda-clara); }
+}
+
+@media (max-width: 1100px) {
+  .mega__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mega__col:nth-child(3) { border-left: 0; }
+  .mega__col:nth-child(n+3), .mega__destaque { border-top: 1px solid rgba(240,240,240,.28); }
+}
+
+@media (max-width: 760px) {
+  .topbar__cell--logo { flex: 1 1 auto; justify-content: flex-start; }
+  .topbar__espaco { display: none; }
+  .topbar__cell--icon { padding: 0 18px; }
+  .topbar__rotulo { display: none; }
+  .mega__grade { grid-template-columns: minmax(0, 1fr); }
+  .mega__col + .mega__col, .mega__destaque { border-left: 0; border-top: 1px solid rgba(240,240,240,.28); }
+  .dobra__titulo { font-size: 30px; }
+  .ultimas__texto h3 { font-size: 23px; }
+  .grade-4 { grid-template-columns: minmax(0, 1fr); }
+  .grade-4 > article + article { border-left: 0; border-top: var(--borda); }
+  .jogo__confronto { gap: 24px; }
+  .jogo__vs { font-size: 32px; }
+}
+
+/* ============================================================
+   Página de matéria
+   ============================================================ */
+.trilha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 28px;
+  background: var(--creme);
+  border: var(--borda);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.trilha span { opacity: .45; }
+.trilha a:last-child { color: var(--marca-tinta); }
+
+/* cabeçalho e foto lado a lado; o texto corrido vem depois, embaixo */
+.materia__topo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.materia__cabecalho {
+  padding: 40px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-right: var(--borda);
+}
+.materia__cabecalho .assinatura { margin-top: auto; }
+.materia__titulo { font-size: 38px; }
+.materia__olho {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--cinza);
+}
+.assinatura {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: var(--borda);
+}
+.assinatura__quem { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 500; }
+.assinatura__quem b { font-weight: 700; }
+.assinatura__quem span { opacity: .5; }
+.compartilhar { display: flex; align-items: center; gap: 8px; }
+.compartilhar span { margin-right: 4px; }
+.compartilhar a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: var(--borda);
+  transition: background .16s ease, color .16s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+.compartilhar a:hover { background: var(--marca); color: var(--sobre-marca); border-color: var(--marca); }
+}
+
+
+.materia__figura { margin: 0; display: flex; flex-direction: column; }
+.materia__figura img { flex: 1 1 auto; width: 100%; min-height: 420px; object-fit: cover; background: var(--foto); }
+.materia__figura figcaption {
+  padding: 14px 24px 16px;
+  border-top: var(--borda);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--cinza);
+}
+
+.materia__corpo { display: grid; grid-template-columns: minmax(0, 1fr) 340px; border-top: var(--borda); }
+
+.texto { padding: 40px 44px 44px; }
+.texto > * { max-width: 68ch; }
+.texto p { margin: 0 0 22px; font-size: 17px; line-height: 1.72; }
+.texto p:last-child { margin-bottom: 0; }
+.texto h2 { font-size: 25px; margin: 34px 0 16px; }
+.texto blockquote {
+  margin: 30px 0;
+  padding: 4px 0 4px 22px;
+  border-left: 3px solid var(--marca);
+  font-size: 20px;
+  line-height: 1.5;
+}
+.texto blockquote cite { display: block; margin-top: 10px; font-size: 11px; font-style: normal; letter-spacing: .08em; text-transform: uppercase; color: var(--cinza); }
+
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 34px; padding-top: 26px; border-top: var(--borda); max-width: none; }
+.tags a { padding: 7px 12px; border: var(--borda); font-size: 11px; font-weight: 500; }
+@media (hover: hover) and (pointer: fine) {
+.tags a:hover { background: var(--escuro); color: var(--sobre-escuro); }
+}
+
+
+.lateral { border-left: var(--borda); }
+.lateral__titulo {
+  padding: 14px 22px;
+  background: var(--marca);
+  color: var(--sobre-marca);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.lateral__item { display: flex; gap: 14px; padding: 18px 22px; }
+.lateral__item + .lateral__item { border-top: var(--borda); }
+.lateral__item img { width: 66px; height: 58px; object-fit: cover; background: var(--foto); flex: 0 0 auto; }
+.lateral__item h3 { font-size: 13px; }
+.lateral__item .texto-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.lateral__numero { font-size: 22px; color: var(--marca-tinta); flex: 0 0 auto; }
+
+@media (max-width: 1100px) {
+  .materia__topo { grid-template-columns: minmax(0, 1fr); }
+  .materia__cabecalho { border-right: 0; border-bottom: var(--borda); }
+  .materia__corpo { grid-template-columns: minmax(0, 1fr); }
+  .lateral { border-left: 0; border-top: var(--borda); }
+}
+@media (max-width: 760px) {
+  .materia__cabecalho { padding: 28px 20px; }
+  .materia__titulo { font-size: 27px; }
+  .materia__figura img { min-height: 240px; }
+  .materia__olho { font-size: 16px; }
+  .texto { padding: 28px 20px; }
+  .materia__figura img { height: 240px; }
+  .materia__figura figcaption { padding: 12px 20px 16px; }
+}
+
+/* manchete clicável: o link ocupa o bloco todo do título */
+h1 .display, h1 > a, h3 > a { display: block; transition: color .16s ease; }
+@media (hover: hover) and (pointer: fine) {
+h3 > a:hover, h1 > a:hover { color: var(--marca-tinta); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+.chamada:hover img, .grade-4 article:hover img,
+.lateral__item:hover img { opacity: .82; }
+}
+
+
+
+/* ============================================================
+   Interruptor de tema
+   ============================================================ */
+.tema__icone { display: none; }
+:root:not([data-tema="dark"]) .tema__icone--lua { display: block; }
+:root[data-tema="dark"] .tema__icone--sol { display: block; }
+
+html { color-scheme: light; }
+:root[data-tema="dark"] { color-scheme: dark; }
+
+/* no escuro a foto pede um leve recuo de brilho pra nao estourar */
+:root[data-tema="dark"] img:not([src$=".svg"]) { filter: brightness(.92); }
+
+/* ============================================================
+   Hover do card: o conteúdo inteiro desliza junto, não só o título.
+   O deslocamento vai nos filhos diretos, e não no card, porque
+   mover o card empurraria também a borda e o fundo dele.
+   ============================================================ */
+.dobra__principal > *,
+.chamada > *,
+.grade-4 article > *,
+.mega__destaque > *,
+.lateral__item > *,
+.video > * {
+  /* as duas propriedades na mesma declaração: transition não soma entre regras,
+     a última vence inteira e zeraria a animação da outra */
+  transition: transform .34s cubic-bezier(.33, 1, .68, 1), opacity .34s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+.dobra__principal:hover > *,
+.chamada:hover > *,
+.grade-4 article:hover > *,
+.mega__destaque:hover > *,
+.lateral__item:hover > *,
+.video:hover > * {
+  transform: translateX(5px);
+}
+}
+
+
+/* a cor do título continua reagindo, sem deslocamento próprio pra não somar 16px */
+.dobra__principal h1 > a,
+.chamada h3 > a,
+.grade-4 article h3 > a,
+.mega__destaque h3 > a,
+.lateral__item h3,
+.video h3 { display: block; transition: color .26s ease; }
+@media (hover: hover) and (pointer: fine) {
+.dobra__principal:hover h1 > a,
+.chamada:hover h3 > a,
+.grade-4 article:hover h3 > a,
+.mega__destaque:hover h3 > a,
+.lateral__item:hover h3,
+.video:hover h3 { color: var(--marca-tinta); }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .dobra__principal:hover > *, .chamada:hover > *, .grade-4 article:hover > *,
+  .mega__destaque:hover > *,
+  .lateral__item:hover > *, .video:hover > * { transform: none; }
+}
+
+
+/* ---------- destaque da home com olho e assinatura ---------- */
+.dobra__olho {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--cinza);
+}
+.dobra__principal .assinatura { margin-top: 4px; padding-bottom: 24px; }
+
+/* ============================================================
+   Escala unica de padding (desktop)
+   ============================================================ */
+/* Uma escala so no site inteiro: caixa grande 32/36 (dobra, materia, ultimas),
+   card 24, barra 18/28 (faixa, trilha). Antes a materia usava 40/44 e cada
+   componente tinha a sua: trocar de pagina mudava o "respiro" do site. */
+.materia__cabecalho { padding: 32px 36px; }
+.texto { padding: 32px 36px 36px; }
+.trilha { padding: 18px 28px; }
+.ultimas__texto { padding: 32px 36px; }
+
+/* Manchete da home um degrau menor. */
+.dobra__titulo { font-size: 40px; }
+
+/* Base dos cards alinhada: o horario ancora no pe do card, e o espaco que
+   sobrar fica entre o texto e ele, nao pendurado no fim de cada card com
+   altura diferente. */
+.grade-4 > article .tempo { margin-top: auto; }
+
+/* O thumb de video foi desenhado como caixa vazia com um play por cima.
+   Quando ha imagem dentro, ela preenche a caixa toda e o play some: e foto,
+   nao video. Sem isto a imagem nao cobre o thumb e sobra um vao branco. */
+.video__thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.video__thumb:has(img)::after { display: none; }
+
+/* ============================================================
+   Toque
+   ============================================================ */
+/* Toda regra :hover deste arquivo vive dentro de @media (hover: hover).
+   Em aparelho de toque nao basta neutralizar o efeito: enquanto a regra
+   EXISTIR, o Safari/iOS trata o primeiro toque como "passar o mouse" e so o
+   segundo ativa o link. */
+a, button, .grade-4 > article, .chamada, .lateral__item, .video, .cronologico a {
+  touch-action: manipulation;
+}
+a, button { -webkit-tap-highlight-color: transparent; }
+
+/* O menu trava o scroll da pagina enquanto aberto. Se o painel for mais alto
+   que a tela, o conteudo de baixo fica inalcancavel. Altura maxima e scroll
+   proprio resolvem. */
+.mega.is-open .mega__inner {
+  max-height: calc(100dvh - 80px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ============================================================
+   Dobra em duas colunas (desktop e tablet)
+   ============================================================ */
+/* Texto a esquerda, foto a direita. Empilhado, o titulo empurra a foto para
+   baixo e ela vira uma faixa larga e baixa, que mostra pouco. */
+@media (min-width: 761px) {
+  .dobra__principal {
+    padding: 32px 36px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 40%;
+    column-gap: 28px;
+    align-items: start;
+  }
+  .dobra__texto { display: flex; flex-direction: column; gap: 18px; }
+  .dobra__foto { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
+}
+
+@media (max-width: 1100px) {
+  /* Em coluna unica nao ha altura de referencia para dividir: cada chamada
+     tem a altura do proprio conteudo, com a foto quadrada e o texto CENTRADO
+     na vertical, para nao sobrar vao branco embaixo do texto. */
+  .dobra__chamadas { display: block; }
+  .chamada { flex: none; align-items: center; }
+  .chamada img { flex: 0 0 34%; width: 34%; aspect-ratio: 1 / 1; height: auto; }
+}
+
+/* ============================================================
+   Mobile (mesmo breakpoint do design original: 760px)
+   ============================================================ */
+@media (max-width: 760px) {
+  /* O --gap governa a margem ate a borda da tela E o espaco entre blocos.
+     Cortando a variavel, os dois encolhem juntos. */
+  :root { --gap: 12px; }
+
+  /* Manchete um degrau menor tambem aqui. */
+  .dobra__titulo { font-size: 28px; }
+
+  /* Uma medida so para toda caixa de conteudo: 12px. */
+  .dobra__principal {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 12px;
+    padding: 12px;
+  }
+  .dobra__texto { display: flex; flex-direction: column; gap: 12px; }
+  .dobra__foto { aspect-ratio: 3 / 2; height: auto; min-height: 0; }
+  .dobra__principal .assinatura { padding-bottom: 12px; }
+  .chamada { padding: 10px 12px; gap: 10px; }
+  .faixa-secao { padding: 10px 12px; }
+  .trilha { padding: 10px 12px; }
+
+  /* Materia: o padding mora nos elementos REAIS (cabecalho, texto), nunca nos
+     wrappers. Padding no wrapper somava com o de dentro (12+28 = 40px) e,
+     pior, afastava da borda a linha que divide o "Leia tambem": a linha tem
+     que bater na ponta do card. */
+  .materia__cabecalho { padding: 12px; }
+  .texto { padding: 12px; }
+  .materia__figura figcaption { padding: 10px 12px; }
+  .lateral { padding: 0; }
+  .lateral__titulo { padding: 10px 12px; }
+  .lateral__item { padding: 10px 12px; }
+  .tabela th:first-child, .tabela td:first-child { padding-left: 12px; }
+  .tabela th:last-child, .tabela td:last-child { padding-right: 12px; }
+  .video { padding: 10px 12px; gap: 12px; align-items: center; }
+  .video__thumb { width: 34%; height: auto; aspect-ratio: 1 / 1; }
+  .ultimas__foto { padding: 12px; }
+  .ultimas__foto img { height: auto; aspect-ratio: 3 / 2; }
+  .ultimas__texto { padding: 12px; }
+  .materia__figura img { height: auto; min-height: 0; aspect-ratio: 3 / 2; }
+  .rodape__marca, .rodape__col { padding: 20px 12px; }
+  .rodape__legal { padding: 12px; }
+
+  /* Publicacao separada, nao colada: cada card vira um bloco proprio com
+     borda INTEIRA nos quatro lados. A regra `article + article` existe para
+     vencer a do design original (mais especifica), que apagava a borda
+     esquerda de todo card menos o primeiro. O destaque das Ultimas tambem
+     ganha a propria borda, senao fica sem linha nenhuma quando o container
+     perde a dele. */
+  .bloco:has(> .grade-4) { border: 0; background: none; }
+  .bloco:has(> .grade-4) > .faixa-secao { border: var(--borda); }
+  .bloco:has(> .grade-4) > .ultimas__destaque {
+    border: var(--borda);
+    background: var(--base);
+    margin-top: 10px;
+  }
+  .grade-4 { gap: 10px; margin-top: 10px; }
+  /* Os :nth-child cobrem as regras do layout de 2 colunas (border-left: 0 no
+     terceiro card), que tem especificidade maior que `article + article` e
+     continuava apagando a borda esquerda de 1 card a cada grade. */
+  .grade-4 > article,
+  .grade-4 > article + article,
+  .grade-4 > article:nth-child(3),
+  .grade-4 > article:nth-child(n+3) {
+    border: var(--borda);
+    background: var(--base);
+    padding: 12px;
+  }
+  .grade-4--continuacao { border-top: 0; }
+  /* Padrao unico de imagem grande no site: paisagem 3:2, o mesmo da pagina
+     de materia. Quadrado so nos thumbs pequenos ao lado de texto. */
+  .grade-4 article img { aspect-ratio: 3 / 2; object-fit: cover; height: auto; }
+}
+
+/* ============================================================
+   Busca na propria barra
+   ============================================================ */
+/* Clicar na lupa nao troca de pagina: o campo ocupa o espaco vazio da topbar
+   e os outros botoes saem. Fecha no X ou no Esc. */
+.topbar__busca {
+  display: none;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--base);
+  border-right: var(--borda);
+}
+body.busca-aberta .topbar__busca { display: flex; }
+body.busca-aberta .topbar__espaco,
+body.busca-aberta #btn-busca,
+body.busca-aberta #btn-tema { display: none; }
+
+.topbar__busca input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: none;
+  padding: 0 20px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--preto);
+  outline: none;
+}
+.topbar__busca input::placeholder { color: var(--cinza); opacity: .8; }
+.topbar__busca button {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  height: 100%;
+  border: 0;
+  border-left: var(--borda);
+  background: none;
+  color: var(--preto);
+  cursor: pointer;
+}
+.topbar__busca button[type=submit] { background: var(--marca); color: var(--sobre-marca); }
+
+@media (max-width: 620px) {
+  /* Em tela estreita a barra vira so o campo: ate a marca sai, senao nao
+     sobra largura util para digitar. */
+  body.busca-aberta .topbar__cell--logo { display: none; }
+  .topbar__busca input { padding: 0 14px; font-size: 16px; }
+  .topbar__busca button { padding: 0 14px; }
+}
+
+/* Crédito da apuração na matéria de texto próprio. Discreto, mas nunca
+   opcional: é o que separa reescrever de se apropriar. */
+.materia__apuracao {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: var(--borda);
+  color: var(--cinza);
+  font-size: 12px;
+}
+.materia__apuracao a { text-decoration: underline; }

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+backup_dir=/srv/backups/paraibao
+timestamp=$(date -u +%Y%m%dT%H%M%SZ)
+install -d -m 700 "$backup_dir"
+
+docker exec paraibao-engine-db-1 \
+  pg_dump -U paraibao -d paraibao -Fc \
+  > "$backup_dir/paraibao-$timestamp.dump"
+
+find "$backup_dir" -type f -name 'paraibao-*.dump' -mtime +7 -delete
+

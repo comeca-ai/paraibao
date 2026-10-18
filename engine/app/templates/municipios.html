@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block titulo %}Os 223 municípios da Paraíba | Paraibão{% endblock %}
+{% block descricao %}Notícias de cada um dos 223 municípios da Paraíba, organizadas por mesorregião: Mata Paraibana, Agreste, Borborema e Sertão.{% endblock %}
+
+{% block conteudo %}
+<div class="cabeca">
+  <div class="chapeu">Cobertura</div>
+  <h1>Os 223 municípios da Paraíba</h1>
+  <p>{{ com_noticia }} municípios com notícia publicada. O número entre parênteses é a quantidade de matérias.</p>
+</div>
+
+{% for regiao in regioes %}
+<div class="secao">
+  <div class="secao-topo"><h2>{{ regiao.nome }}</h2><span style="font-size:13px;color:var(--cinza)">{{ regiao.municipios|length }} municípios</span></div>
+  <div class="nuvem">
+    {% for m in regiao.municipios %}
+    <a href="/municipio/{{ m.slug }}">{{ m.name }}{% if m.total %} <b>{{ m.total }}</b>{% endif %}</a>
+    {% endfor %}
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

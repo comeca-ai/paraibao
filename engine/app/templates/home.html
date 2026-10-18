@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card, lista_cronologica %}
+
+{% block titulo %}Paraibão | Notícias da Paraíba, dos 223 municípios{% endblock %}
+{% block descricao %}Notícias da Paraíba reunidas dos principais veículos do estado, organizadas por município e por editoria.{% endblock %}
+
+{% block conteudo %}
+{% if destaques %}
+<div class="grade dupla" style="margin:30px 0 8px">
+  {% for a in destaques %}{{ card(a, destaque=true) }}{% endfor %}
+</div>
+{% endif %}
+
+<div class="colunas secao">
+  <div>
+    <div class="secao-topo"><h2>Últimas notícias</h2><a href="/ultimas">Ver todas</a></div>
+    <div class="grade dupla">
+      {% for a in ultimas %}{{ card(a) }}{% endfor %}
+    </div>
+    {% if not ultimas and not destaques %}
+    <div class="vazio"><strong>Ainda sem notícias</strong>O coletor roda a cada 10 minutos.</div>
+    {% endif %}
+  </div>
+  <aside>
+    <div class="secao-topo"><h2>Agora</h2></div>
+    {{ lista_cronologica(cronologico) }}
+  </aside>
+</div>
+
+{% for bloco in por_editoria %}
+<div class="secao">
+  <div class="secao-topo">
+    <h2>{{ bloco.rotulo }}</h2>
+    <a href="/editoria/{{ bloco.slug }}">Ver tudo</a>
+  </div>
+  <div class="grade">
+    {% for a in bloco.artigos %}{{ card(a) }}{% endfor %}
+  </div>
+</div>
+{% endfor %}
+
+{% if municipios_ativos %}
+<div class="secao">
+  <div class="secao-topo">
+    <h2>Municípios com notícia</h2>
+    <a href="/municipios">Os 223 municípios</a>
+  </div>
+  <div class="nuvem">
+    {% for m in municipios_ativos %}
+    <a href="/municipio/{{ m.slug }}">{{ m.name }} <b>{{ m.total }}</b></a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,983 @@
+/* ============================================================
+   Paraibão · folha única
+
+   Arquitetura copiada do estadao.com.br, medida no site e não de
+   memória: container 1292, coluna de texto 728, fio divisor #e4e4e8,
+   manchete com tracking negativo, chapéu em caixa alta.
+
+   O que NÃO veio do Estadão é a tipografia: a manchete continua em
+   Neue Helvena, a fonte da casa. O Estadão usa serifada; aqui o
+   desenho é o mesmo e a voz é nossa.
+
+   Duas regras explicam quase todo o arquivo:
+   1. Nada de moldura. Bloco não tem borda, tem fio em cima. O que
+      separa conteúdo é espaço em branco, não caixa.
+   2. Caixa mista no título, caixa alta no rótulo. Título é frase e
+      se lê como frase; chapéu, editoria e crédito são etiqueta e
+      continuam duros.
+
+   A versão anterior (brutalista, borda preta, título em caixa alta)
+   está preservada em styles-v1-brutalista.css.
+   ============================================================ */
+
+:root {
+  --fundo:      #ffffff;
+  --tinta:      #1a1a1d;   /* título e texto */
+  --tinta-2:    #5b5b66;   /* olho, crédito */
+  --tinta-3:    #8a8a95;   /* hora, legenda */
+
+  --fio:        #e4e4e8;   /* divisor. Claro de propósito: organiza, não desenha */
+
+  --marca:      #224ae9;
+  --marca-fraca:#c3cff9;
+  --marca-fundo:#eef1fd;
+
+  /* Único acento quente do site. Existe para a lista de chamadas não
+     virar mais um bloco cinza. */
+  --ponto:      #f90921;
+
+  --container:  1292px;
+  --col-texto:  728px;    /* largura de leitura da matéria */
+  --col-materia:1047px;   /* cabeçalho e foto da matéria */
+
+  /* Ritmo vertical. Todo bloco de conteúdo respira o MESMO valor em cima
+     e embaixo, e o fio divisor sempre nasce nesse respiro. Sem um número
+     único, cada bloco inventa o seu e o último elemento acaba encostando
+     no fio do bloco seguinte. */
+  --bloco-y:    40px;
+
+  --escuro:     #14141a;  /* menu e rodapé */
+  --foto:       #ececed;  /* fundo enquanto a imagem não chega */
+
+  /* Mantidas porque municipios.html ainda as cita inline. */
+  --borda:      1px solid #e4e4e8;
+  --max:        1292px;
+  --preto:      #1a1a1d;
+  --cinza:      #5b5b66;
+  --base:       #ffffff;
+  --branco:     #ffffff;
+  --sobre-escuro: #f2f2f4;
+  --linha:      #e4e4e8;
+  --marca-tinta: #224ae9;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--tinta);
+  font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+
+/* ============================================================
+   Neue Helvena · subconjunto latino
+   ============================================================ */
+@font-face {
+  font-family: "Neue Helvena";
+  src: url("fonts/NeueHelvena-Bold.woff2") format("woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Neue Helvena";
+  src: url("fonts/NeueHelvena-Extrabold.woff2") format("woff2");
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+
+/* ---------- tipografia ----------
+   A Neue Helvena é uma grotesca pesada. Em caixa mista ela ocupa mais
+   mancha que a serifada do Estadão no mesmo corpo, então a escala aqui
+   é ~10% menor que a de lá e o tracking é mais fechado. Copiar o número
+   do Estadão sem corrigir isso deixaria o título gordo. */
+.display {
+  font-family: "Neue Helvena", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.021em;
+  line-height: 1.1;
+  margin: 0;
+  text-wrap: balance;
+}
+.display a:hover { color: var(--marca); }
+
+.rotulo {
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.rotulo--marca, .chip { color: var(--marca); }
+
+.resumo { color: var(--tinta-2); font-size: 14px; line-height: 1.5; margin: 0; }
+.tempo  { color: var(--tinta-3); font-size: 12px; letter-spacing: .02em; }
+
+/* ============================================================
+   1 · Topo
+   Barra fina, fio embaixo, nada flutuando. Logo, editorias, ações.
+   ============================================================ */
+.topbar {
+  position: sticky; top: 0; z-index: 60;
+  display: flex; align-items: stretch; gap: 0;
+  height: 68px;
+  /* Recuo dos dois lados: sem o bloco azul atrás dela, a logo encostava na
+     borda esquerda da tela. */
+  padding: 0 24px;
+  background: var(--fundo);
+  border-bottom: 1px solid var(--fio);
+}
+/* Sem bloco de fundo: a marca é a própria palavra, grande, na cor da casa.
+   Por isso o arquivo usado aqui é o `logo-marca.svg`; a `logo.svg` é branca
+   e existe para os fundos escuros (menu e rodapé). */
+.topbar__cell--logo {
+  flex: none; display: flex; align-items: center;
+  align-self: center;
+  margin-right: 30px;
+}
+/* O viewBox do SVG foi apertado na caixa real do letreiro (o ® saiu e com
+   ele 7,4 unidades de espaço morto no topo), então esta altura é a altura
+   da PALAVRA, não da moldura. Por isso 36px aqui é bem maior que os 34px
+   de antes. */
+.topbar__cell--logo img { height: 36px; width: auto; }
+/* Letreiro em texto: usado pela praça que ainda não tem SVG de logo. Mesma
+   altura visual do arquivo, para o topo não mudar de tamanho quando a arte
+   definitiva chegar. */
+.topbar__letreiro {
+  font-family: "Neue Helvena", Helvetica, Arial, sans-serif;
+  font-size: 32px; font-weight: 800; letter-spacing: -0.03em;
+  text-transform: uppercase; color: var(--marca); line-height: 1;
+}
+.rodape__letreiro { color: #fff; font-size: 24px; display: inline-block; margin-bottom: 16px; }
+
+/* Editorias na própria barra. É o que substitui o hambúrguer no desktop. */
+.topbar__nav {
+  display: flex; align-items: center; gap: 22px;
+  min-width: 0; overflow: hidden;
+}
+/* Neue Helvena também aqui, e não DM Sans: a barra é marca, não interface.
+   Em caixa alta e com tracking aberto ela dialoga com a logo em vez de
+   parecer menu de sistema. */
+.topbar__nav a {
+  font-family: "Neue Helvena", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700; font-size: 14px;
+  letter-spacing: .045em; text-transform: uppercase;
+  color: var(--tinta); white-space: nowrap;
+  padding: 6px 0; border-bottom: 2px solid transparent;
+}
+.topbar__nav a:hover { color: var(--marca); }
+/* A seção ativa é um retângulo azul sólido, o mesmo bloco que a logo tinha.
+   Ele substitui o traço embaixo: os dois juntos marcavam a mesma coisa duas
+   vezes. */
+.topbar__nav a.is-atual {
+  color: #fff; background: var(--marca);
+  border-bottom-color: transparent;
+  padding: 7px 12px;
+}
+
+.topbar__espaco { flex: 1 1 auto; }
+/* O indicador de arraste é coisa de tela de toque; no desktop a régua cabe. */
+.topbar__trilho { display: none; }
+
+/* `align-self: center` é obrigatório: a barra é `align-items: stretch` por
+   causa do bloco azul da logo, e altura explícita com stretch ancora o
+   botão no topo da linha em vez de centralizar. */
+.topbar__botao {
+  flex: none; align-self: center;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; padding: 0;
+  background: none; border: 0; cursor: pointer;
+  color: var(--tinta); font: inherit;
+}
+.topbar__botao:hover { color: var(--marca); }
+.topbar__rotulo { display: none; }
+
+/* Busca: cresce sobre a barra e some com o resto. */
+.topbar__busca { display: none; flex: 1 1 auto; align-items: center; gap: 8px; }
+.topbar__busca input {
+  flex: 1 1 auto; min-width: 0;
+  height: 40px; padding: 0 12px;
+  border: 1px solid var(--fio);
+  background: var(--fundo); color: var(--tinta);
+  font: 500 15px/1 "DM Sans", system-ui, sans-serif;
+}
+.topbar__busca input:focus { outline: none; border-color: var(--marca); }
+.topbar__busca button {
+  height: 40px; width: 40px; flex: none;
+  background: none; border: 0; cursor: pointer; color: var(--tinta-2);
+}
+body.busca-aberta .topbar__busca { display: flex; }
+body.busca-aberta .topbar__nav,
+body.busca-aberta .topbar__espaco,
+body.busca-aberta #btn-busca { display: none; }
+
+/* Hambúrguer do design original: 34x29, barra de 5px, e vira X ao abrir. */
+.burger {
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 5px; width: 34px; height: 29px;
+}
+.burger span {
+  display: block; width: 34px; height: 5px; background: currentColor;
+  transition: transform .32s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
+}
+.menu-aberto .burger span:nth-child(1) { transform: translateY(10px) rotate(45deg); }
+.menu-aberto .burger span:nth-child(2) { opacity: 0; }
+.menu-aberto .burger span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
+@media (prefers-reduced-motion: reduce) { .burger span { transition: none; } }
+
+/* ============================================================
+   2 · Faixa da previsão do tempo (classe `previsao`, nunca `tempo`)
+   Entrou no lugar do ticker de manchetes, que repetia o que já estava
+   logo abaixo na dobra. Sem animação: informação que o leitor vem
+   buscar não pode estar se movendo quando ele chega.
+   ============================================================ */
+/* A moldura é de ponta a ponta, para o fio de baixo atravessar a tela como
+   o da barra de navegação. Quem fica preso ao container é o conteúdo.
+
+   Chama-se `previsao` e NÃO `tempo`: `.tempo` já era o rótulo de horário
+   ("há 1 hora") usado no site inteiro, e reusar o nome colocou borda
+   embaixo de todo carimbo de tempo do portal. */
+.previsao { border-bottom: 1px solid var(--fio); }
+.previsao__interno {
+  display: flex; align-items: stretch; gap: 0;
+  max-width: var(--container); margin: 0 auto;
+  padding: 0 24px;
+}
+.previsao__selo {
+  flex: none; display: flex; align-items: center;
+  padding-right: 20px; color: var(--tinta-3);
+}
+.previsao__pista {
+  flex: 1 1 auto; display: flex; min-width: 0;
+  overflow-x: auto; scrollbar-width: none;
+}
+.previsao__pista::-webkit-scrollbar { display: none; }
+
+.previsao__cidade {
+  flex: none; display: flex; align-items: center; gap: 8px;
+  padding: 11px 15px; border-left: 1px solid var(--fio);
+  white-space: nowrap;
+}
+.previsao__cidade:last-child { border-right: 1px solid var(--fio); }
+.previsao__cidade:hover { background: #f7f7f9; }
+.previsao__nome { font-size: 13.5px; font-weight: 500; }
+.previsao__grau {
+  font-family: "Neue Helvena", Helvetica, Arial, sans-serif;
+  font-size: 17px; font-weight: 800; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+/* Chance de chuva: azul, porque é o único número acionável da faixa. */
+.previsao__chuva {
+  font-size: 11.5px; font-weight: 700; color: var(--marca);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ícones desenhados em CSS: são cinco formas simples e um arquivo SVG a
+   mais no caminho crítico da home não se paga.
+
+   Todos animam, devagar: a faixa é a única parte da home que muda sozinha,
+   e o movimento é o que diz "isto é agora". Só `transform` e `opacity`, que
+   rodam na GPU e não forçam recálculo de layout numa barra com seis cópias. */
+.previsao__icone { flex: none; position: relative; width: 16px; height: 16px; }
+.previsao__icone::before, .previsao__icone::after { content: ""; position: absolute; }
+
+/* sol: respira */
+.previsao__icone--sol::before {
+  inset: 2px; border-radius: 50%; background: #f5a623;
+  animation: sol-pulsa 3.6s ease-in-out infinite;
+}
+@keyframes sol-pulsa {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(245,166,35,.55); }
+  50%      { transform: scale(1.07); box-shadow: 0 0 0 3px rgba(245,166,35,0); }
+}
+
+/* sol com nuvem: a nuvem passa na frente do sol e volta */
+.previsao__icone--sol-nuvem::before {
+  left: 0; top: 1px; width: 9px; height: 9px; border-radius: 50%; background: #f5a623;
+  animation: sol-pulsa 3.6s ease-in-out infinite;
+}
+.previsao__icone--sol-nuvem::after {
+  right: 0; bottom: 2px; width: 12px; height: 8px; border-radius: 5px; background: #b9bcc4;
+  animation: nuvem-anda 5.5s ease-in-out infinite;
+}
+@keyframes nuvem-anda {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(-3px); }
+}
+
+/* nuvem sozinha: deriva */
+.previsao__icone--nuvem::before {
+  left: 1px; bottom: 3px; width: 14px; height: 9px; border-radius: 5px; background: #b9bcc4;
+  animation: nuvem-anda 6s ease-in-out infinite;
+}
+
+/* névoa: as duas faixas deslizam em sentidos opostos */
+.previsao__icone--nevoa::before {
+  left: 0; top: 4px; width: 16px; height: 2px; border-radius: 1px; background: #b9bcc4;
+  animation: nevoa-desliza 4.5s ease-in-out infinite;
+}
+.previsao__icone--nevoa::after {
+  left: 2px; top: 9px; width: 12px; height: 2px; border-radius: 1px; background: #b9bcc4;
+  animation: nevoa-desliza 4.5s ease-in-out infinite reverse;
+}
+@keyframes nevoa-desliza {
+  0%, 100% { transform: translateX(-2px); opacity: .7; }
+  50%      { transform: translateX(2px);  opacity: 1; }
+}
+
+/* chuva: as gotas caem e reaparecem em cima */
+.previsao__icone--chuva::before {
+  left: 1px; top: 2px; width: 14px; height: 8px; border-radius: 5px; background: #7f95c9;
+}
+.previsao__icone--chuva::after {
+  left: 5px; bottom: 1px; width: 2px; height: 4px; border-radius: 1px; background: #4a6fd4;
+  box-shadow: 4px 1px 0 #4a6fd4;
+  animation: gota-cai 1.25s linear infinite;
+}
+@keyframes gota-cai {
+  0%   { transform: translateY(-3px); opacity: 0; }
+  25%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { transform: translateY(3px);  opacity: 0; }
+}
+
+/* tempestade: o raio pisca */
+.previsao__icone--tempestade::before {
+  left: 1px; top: 1px; width: 14px; height: 8px; border-radius: 5px; background: #6b7280;
+}
+.previsao__icone--tempestade::after {
+  left: 6px; bottom: 0; width: 0; height: 0;
+  border-left: 3px solid transparent; border-right: 3px solid transparent;
+  border-top: 6px solid #f5a623;
+  animation: raio-pisca 2.4s steps(1, end) infinite;
+}
+@keyframes raio-pisca {
+  0%, 62%, 70%, 78%, 100% { opacity: 1; }
+  66%, 74%                { opacity: .15; }
+}
+
+/* Quem pediu menos animação no sistema recebe a faixa parada. */
+@media (prefers-reduced-motion: reduce) {
+  .previsao__icone::before, .previsao__icone::after { animation: none !important; }
+}
+
+/* ============================================================
+   3 · Estrutura de página
+   ============================================================ */
+.corpo { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+
+.bloco { padding: var(--bloco-y) 0; border-top: 1px solid var(--fio); }
+.bloco:first-child { border-top: 0; }
+
+/* Título de seção: retângulo sólido na cor da marca. É o único bloco de
+   cor que sobrou no corpo da página, e ele existe para uma coisa só:
+   dizer que ali começa uma seção nova. Um fio fino não dava esse aviso
+   numa página branca com muito conteúdo empilhado. */
+.faixa-secao {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 24px;
+  padding: 13px 20px;
+  background: var(--marca); color: #fff;
+}
+.faixa-secao h2 {
+  font-size: 20px; font-weight: 800; letter-spacing: -0.018em; color: #fff;
+}
+.faixa-secao a {
+  font-weight: 700; font-size: 12px; letter-spacing: .06em;
+  text-transform: uppercase; color: rgba(255,255,255,.82); white-space: nowrap;
+}
+.faixa-secao a:hover { color: #fff; }
+/* Faixa sozinha no bloco (o cabeçalho de /municipios) não precisa do
+   respiro que existe para separar dela o conteúdo que vem embaixo. */
+.bloco > .faixa-secao:last-child { margin-bottom: 0; }
+
+/* Quem separa a seção passa a ser o retângulo, então o fio de cima do
+   bloco sai: os dois juntos marcam a mesma fronteira duas vezes.
+   O seletor é de descendente, não de filho direto: no bloco duplo a faixa
+   mora dentro da coluna, e com `>` aquele bloco ficava com 40px de padding
+   a mais que todos os outros. */
+.bloco:has(.faixa-secao) { border-top: 0; padding-top: 0; }
+
+/* ============================================================
+   4 · Dobra
+   Unidade do Estadão: foto, chapéu, manchete, olho e, embaixo, as
+   chamadas do mesmo assunto em duas colunas de marcador. À direita,
+   a mesma unidade em corpo menor, separada por um fio vertical.
+   ============================================================ */
+.dobra {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 40px;
+  /* O respiro de baixo é obrigatório: sem ele a lista de marcador encosta
+     no fio do bloco seguinte e a dobra parece cortada. */
+  padding: 32px 0 var(--bloco-y);
+}
+.dobra__principal { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.dobra__foto { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--foto); }
+.dobra__texto { display: flex; flex-direction: column; gap: 12px; }
+.dobra__meta { display: flex; align-items: center; gap: 10px; }
+.dobra__meta .rotulo:not(.chip) { color: var(--tinta-3); }
+
+.dobra__titulo { font-size: 46px; font-weight: 800; line-height: 1.06; letter-spacing: -0.026em; }
+.dobra__olho { margin: 0; font-size: 18px; line-height: 1.5; color: var(--tinta-2); max-width: 40em; }
+.dobra__credito { margin: 2px 0 0; font-size: 13px; color: var(--tinta-3); }
+.dobra__credito b { color: var(--tinta-2); font-weight: 700; }
+
+.dobra__chamadas {
+  border-left: 1px solid var(--fio);
+  padding-left: 32px;
+  display: flex; flex-direction: column; gap: 26px;
+  min-width: 0;
+}
+
+.chamada { display: flex; flex-direction: column; gap: 10px; }
+.chamada img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--foto); }
+.chamada__texto { display: flex; flex-direction: column; gap: 6px; }
+.chamada__texto h3 { font-size: 19px; font-weight: 700; }
+
+/* Lista de marcador: o formato que o Estadão usa para amarrar o
+   desdobramento à manchete. Duas colunas porque quatro linhas
+   empilhadas empurram a dobra para fora da tela. */
+.marcadores {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px 32px;
+  padding-top: 20px; border-top: 1px solid var(--fio);
+}
+.marcadores a {
+  display: grid; grid-template-columns: 6px 1fr; gap: 10px; align-items: start;
+  font-weight: 700; font-size: 15px; line-height: 1.35;
+}
+.marcadores a::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ponto); margin-top: 7px;
+}
+.marcadores a:hover { color: var(--marca); }
+
+/* ============================================================
+   5 · Grades de card
+   Card não tem moldura: foto, chapéu, título e hora, empilhados.
+   ============================================================ */
+.grade-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+.grade-4--continuacao { margin-top: 32px; padding-top: 32px; border-top: 1px solid var(--fio); }
+.grade-4 > article { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.grade-4 > article img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--foto); margin-bottom: 2px; }
+.grade-4 > article h3 { font-size: 18px; font-weight: 700; }
+.grade-4 > article .resumo { display: none; }
+
+/* destaque de Últimas: foto grande à esquerda, texto à direita.
+   Sem respiro embaixo de propósito: quem separa daqui para a grade é o
+   `margin-top` do .grade-4--continuacao. Ter os dois soma 64px e abre um
+   rombo no meio do bloco. */
+.ultimas__destaque {
+  display: grid; grid-template-columns: 1.15fr 1fr; gap: 32px;
+}
+.ultimas__foto img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--foto); }
+.ultimas__texto { display: flex; flex-direction: column; gap: 10px; align-self: center; }
+.ultimas__texto h3 { font-size: 30px; font-weight: 800; letter-spacing: -0.024em; }
+.ultimas__texto .resumo { font-size: 16px; }
+
+/* ============================================================
+   6 · Bloco duplo (vídeo/imagem + tabela)
+   ============================================================ */
+.duplo { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+.duplo__lado { min-width: 0; }
+
+.video { display: grid; grid-template-columns: 160px 1fr; gap: 16px; padding: 16px 0; border-top: 1px solid var(--fio); }
+.video:first-of-type { border-top: 0; padding-top: 0; }
+.video__thumb img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--foto); }
+.video__texto { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.video__texto h3 { font-size: 17px; font-weight: 700; }
+
+.tabela { width: 100%; border-collapse: collapse; font-size: 15px; }
+.tabela th {
+  text-align: left; padding: 0 0 10px;
+  font: 700 11px/1.2 "DM Sans", system-ui, sans-serif;
+  letter-spacing: .075em; text-transform: uppercase; color: var(--tinta-3);
+  border-bottom: 1px solid var(--fio);
+}
+.tabela td { padding: 13px 0; border-bottom: 1px solid var(--fio); }
+.tabela td:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--tinta-2); }
+.tabela__time { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.tabela__escudo { width: 8px; height: 8px; border-radius: 50%; background: var(--marca); flex: none; }
+
+/* jogo: bloco preservado, sem moldura */
+.jogo__arena { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 32px 0; }
+.jogo__confronto { display: flex; align-items: center; gap: 40px; }
+.jogo__time { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.jogo__escudo { width: 44px; height: 44px; border-radius: 50%; background: var(--foto); }
+.jogo__time .display { font-size: 17px; }
+.jogo__vs { font-size: 15px; color: var(--tinta-3); }
+.jogo__quando { font-size: 14px; color: var(--tinta-2); }
+.jogo__local { font-size: 13px; color: var(--tinta-3); }
+
+/* ============================================================
+   6b · Painel de editoria (abre no hover da barra)
+   Copiado do comportamento do Estadão: o painel desce colado na barra,
+   ocupa a largura toda e escurece o resto da página, para o leitor
+   entender que está navegando e não lendo.
+   ============================================================ */
+.painel {
+  position: fixed; left: 0; right: 0; top: 68px; z-index: 58;
+  background: var(--fundo);
+  border-bottom: 1px solid var(--fio);
+  display: none;
+}
+.painel.is-open { display: block; }
+.painel__inner {
+  max-width: var(--container); margin: 0 auto;
+  padding: 32px 24px 36px;
+  display: grid; grid-template-columns: 260px minmax(0, 1fr) 300px; gap: 48px;
+}
+.painel__titulo {
+  display: block; margin-bottom: 16px;
+  font-family: "Neue Helvena", Helvetica, Arial, sans-serif;
+  font-size: 18px; font-weight: 800; letter-spacing: -0.02em;
+}
+
+.painel__col--menu { display: flex; flex-direction: column; }
+.painel__col--menu a {
+  padding: 8px 0 8px 14px; font-size: 15px;
+  border-left: 3px solid var(--marca-fraca);
+  margin-bottom: 2px;
+}
+.painel__col--menu a:hover { color: var(--marca); border-left-color: var(--marca); }
+
+.painel__grade { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 32px; }
+.painel__item { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: start; }
+.painel__item img { width: 96px; aspect-ratio: 4 / 3; object-fit: cover; background: var(--foto); }
+.painel__item span { font-size: 14.5px; font-weight: 700; line-height: 1.35; }
+.painel__item:hover span { color: var(--marca); }
+.painel__mais {
+  display: inline-block; margin-top: 22px;
+  font-weight: 700; font-size: 13px; letter-spacing: .04em;
+  color: var(--marca);
+}
+
+.painel__destaque { display: flex; flex-direction: column; gap: 8px; }
+.painel__destaque img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--foto); margin-bottom: 4px; }
+.painel__destaque h3 { font-size: 17px; font-weight: 700; }
+.painel__destaque:hover h3 { color: var(--marca); }
+
+/* Escurece o resto da página enquanto o painel está aberto. */
+.cortina {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(0, 0, 0, .32);
+  display: none;
+}
+.cortina.is-open { display: block; }
+
+/* Editoria com painel aberto ganha o traço embaixo, como no Estadão. */
+.topbar__nav a[aria-expanded="true"] {
+  color: var(--tinta); border-bottom-color: var(--tinta);
+}
+
+/* ============================================================
+   7 · Menu expandido
+   Só abre no clique. Fundo escuro para separar do site, que agora é
+   branco de ponta a ponta.
+   ============================================================ */
+.mega {
+  position: fixed; inset: 68px 0 auto; z-index: 55;
+  background: var(--escuro); color: var(--sobre-escuro);
+  max-height: calc(100dvh - 68px); overflow-y: auto;
+  display: none;
+}
+.mega.is-open { display: block; }
+.mega__inner { max-width: var(--container); margin: 0 auto; padding: 40px 24px 48px; }
+.mega__grade { display: grid; grid-template-columns: repeat(3, 1fr) 320px; gap: 40px; }
+.mega__col { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mega__col > .rotulo--marca { color: var(--marca-fraca); margin-bottom: 12px; }
+/* Segundo grupo dentro da mesma coluna. O respiro em cima e o fio mais forte
+   são o que dizem que começou outra coisa: sem eles, os itens entravam na
+   lista de cima como se fossem mais duas cidades. */
+.mega__grupo {
+  margin-top: 30px; padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.22);
+}
+.mega__col a {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.09);
+}
+.mega__col a .display { font-size: 17px; font-weight: 700; }
+.mega__col a em { font-style: normal; font-size: 12px; color: rgba(255,255,255,.4); font-variant-numeric: tabular-nums; }
+.mega__col a:hover .display { color: var(--marca-fraca); }
+.mega__sociais { display: flex; gap: 14px; margin-top: 20px; }
+.mega__sociais svg { width: 20px; height: 20px; color: rgba(255,255,255,.6); }
+
+.mega__destaque { display: flex; flex-direction: column; gap: 12px; }
+.mega__badge { color: var(--ponto); }
+.mega__destaque h3 { font-size: 21px; font-weight: 700; }
+.mega__destaque img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #26262e; }
+.mega__botao {
+  align-self: flex-start; color: var(--marca-fraca);
+  border-bottom: 1px solid currentColor; padding-bottom: 2px;
+  font-weight: 700; font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+}
+
+/* ============================================================
+   8 · Matéria
+   Três larguras: cabeçalho e foto em 1047, texto em 728, relacionadas
+   em 1292. É a mesma escada do Estadão.
+   ============================================================ */
+.trilha {
+  max-width: var(--col-materia); margin: 0 auto; padding: 28px 0 0;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--tinta-2);
+}
+.trilha a:hover { color: var(--marca); }
+.trilha span { color: var(--tinta-3); }
+
+.materia__topo { max-width: var(--col-materia); margin: 0 auto; }
+.materia__cabecalho { display: flex; flex-direction: column; gap: 16px; padding: 12px 0 20px; }
+.materia__titulo { font-size: 48px; font-weight: 800; line-height: 1.07; letter-spacing: -0.027em; }
+.materia__olho { margin: 0; font-size: 20px; line-height: 1.5; color: var(--tinta-2); max-width: 36em; }
+
+.assinatura {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+  padding: 16px 0; margin-top: 4px;
+  border-top: 1px solid var(--fio); border-bottom: 1px solid var(--fio);
+}
+.assinatura__quem { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--tinta-2); }
+.assinatura__quem b { color: var(--tinta); font-weight: 700; }
+.assinatura__quem span { color: var(--tinta-3); }
+
+.compartilhar { display: flex; align-items: center; gap: 14px; color: var(--tinta-2); }
+.compartilhar .rotulo { color: var(--tinta-3); }
+.compartilhar a:hover { color: var(--marca); }
+
+/* Foto de abertura: teto de altura porque a foto que chega da fonte vem
+   em qualquer proporção, e retrato aberto em 1047 de largura empurra o
+   texto inteiro para fora da primeira tela. */
+.materia__figura { margin: 28px 0 0; }
+.materia__figura img {
+  width: 100%; max-height: 560px; object-fit: cover;
+  background: var(--foto);
+}
+.materia__figura figcaption { padding-top: 10px; font-size: 12.5px; color: var(--tinta-3); }
+
+.materia__corpo { padding-top: var(--bloco-y); }
+.texto { max-width: var(--col-texto); margin: 0 auto; }
+.texto p { font-size: 19px; line-height: 1.68; margin: 0 0 28px; }
+.texto a { color: var(--marca); border-bottom: 1px solid var(--marca-fraca); }
+
+/* Chamada para a origem. É requisito legal, então tem peso de bloco e
+   não de rodapé: fundo próprio e o link de saída em destaque. */
+.materia__origem {
+  margin: 40px 0 0; padding: 24px;
+  background: var(--marca-fundo); border-left: 3px solid var(--marca);
+}
+.materia__origem p { font-size: 15px; line-height: 1.6; margin: 0 0 14px; color: var(--tinta); }
+.materia__origem .mega__botao { color: var(--marca); }
+.materia__apuracao { font-size: 14px !important; color: var(--tinta-2); font-style: italic; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--fio); }
+.tags a {
+  font: 700 11px/1 "DM Sans", system-ui, sans-serif;
+  letter-spacing: .075em; text-transform: uppercase;
+  padding: 9px 12px; background: #f4f4f6; color: var(--tinta-2);
+}
+.tags a:hover { background: var(--marca); color: #fff; }
+
+/* "Leia também": no Estadão a lista de relacionadas atravessa a matéria
+   em faixa horizontal, não em coluna lateral. A coluna lateral obrigava
+   a matéria a viver em 2/3 da tela e apertava a linha de leitura. */
+.lateral {
+  max-width: var(--container); margin: 48px auto 0; padding-top: 24px;
+  border-top: 1px solid var(--fio);
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px;
+}
+.lateral__titulo {
+  grid-column: 1 / -1;
+  font-family: "Neue Helvena", Helvetica, Arial, sans-serif;
+  font-size: 20px; font-weight: 800; letter-spacing: -0.02em;
+}
+.lateral__item { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.lateral__item img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--foto); }
+.lateral__item h3 { font-size: 16px; font-weight: 700; }
+.texto-col { display: flex; flex-direction: column; gap: 5px; }
+
+/* ============================================================
+   9 · Página de editoria e município
+   Título centralizado e sub-navegação entre dois fios, como o Estadão
+   faz em /politica/.
+   ============================================================ */
+.cabecalho-secao { padding: 44px 0 0; text-align: center; }
+.cabecalho-secao__chapeu { display: block; color: var(--tinta-3); margin-bottom: 10px; }
+.cabecalho-secao h1 {
+  font-family: "Neue Helvena", Helvetica, Arial, sans-serif;
+  font-size: 40px; font-weight: 800; letter-spacing: -0.026em;
+  color: var(--marca); margin: 0;
+}
+.cabecalho-secao p { margin: 12px auto 0; max-width: 46em; color: var(--tinta-2); font-size: 16px; }
+.subnav {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+  margin-top: 28px; padding: 14px 0;
+  border-top: 1px solid var(--fio); border-bottom: 1px solid var(--fio);
+  font-size: 14.5px; color: var(--tinta-2);
+}
+.subnav a { padding: 0 16px; border-right: 1px solid var(--fio); }
+.subnav a:last-child { border-right: 0; }
+.subnav a:hover { color: var(--marca); }
+
+.paginacao a { padding: 11px 20px; border: 1px solid var(--fio); color: var(--tinta); }
+.paginacao a:hover { border-color: var(--marca); color: var(--marca); }
+
+.vazio h3 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+
+/* ============================================================
+   9b · Formulários (Anuncie / Escreva com a gente)
+   Duas colunas: o argumento à esquerda, os campos à direita. Quem chega
+   aqui veio decidir, então o texto que sustenta a decisão fica ao lado do
+   formulário, não acima dele.
+   ============================================================ */
+.formulario {
+  display: grid; grid-template-columns: 1fr 1.15fr; gap: 64px;
+  max-width: var(--col-materia); margin: 0 auto;
+}
+.formulario__h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.022em; margin-bottom: 18px; }
+.formulario__lista { margin: 0; padding: 0; list-style: none; }
+.formulario__lista li {
+  position: relative; padding: 0 0 14px 20px;
+  font-size: 15.5px; line-height: 1.5; color: var(--tinta-2);
+}
+.formulario__lista li::before {
+  content: ""; position: absolute; left: 0; top: 8px;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--ponto);
+}
+.formulario__nota {
+  margin: 18px 0 0; padding-top: 18px; border-top: 1px solid var(--fio);
+  font-size: 14px; line-height: 1.55; color: var(--tinta-3);
+}
+
+.formulario__campos { display: flex; flex-direction: column; gap: 16px; }
+.formulario__par { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.formulario__campos label { display: flex; flex-direction: column; gap: 6px; }
+.formulario__campos label > span {
+  font-weight: 700; font-size: 12px; letter-spacing: .055em;
+  text-transform: uppercase; color: var(--tinta-2);
+}
+.formulario__campos label > span em { font-style: normal; color: var(--tinta-3); text-transform: none; letter-spacing: 0; }
+.formulario__campos input,
+.formulario__campos select,
+.formulario__campos textarea {
+  font: 400 16px/1.4 "DM Sans", system-ui, sans-serif;
+  color: var(--tinta); background: var(--fundo);
+  border: 1px solid var(--fio); padding: 12px 14px; width: 100%;
+}
+.formulario__campos textarea { resize: vertical; min-height: 118px; }
+.formulario__campos input:focus,
+.formulario__campos select:focus,
+.formulario__campos textarea:focus { outline: none; border-color: var(--marca); }
+
+/* Armadilha de robô: sai do fluxo sem usar display:none, que alguns robôs
+   detectam e pulam justamente por isso. */
+.formulario__armadilha {
+  position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;
+}
+
+.botao {
+  align-self: flex-start;
+  font: 700 13px/1 "DM Sans", system-ui, sans-serif;
+  letter-spacing: .06em; text-transform: uppercase;
+  background: var(--marca); color: #fff;
+  border: 0; padding: 16px 28px; cursor: pointer;
+}
+.botao:hover { background: #1b3cc4; }
+
+.formulario__erro {
+  margin: 0; padding: 14px 16px;
+  background: #fdecec; border-left: 3px solid var(--ponto);
+  font-size: 14.5px; color: #8a1220;
+}
+.formulario__legal { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--tinta-3); }
+
+.formulario__ok { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.formulario__ok h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.022em; }
+.formulario__ok p { margin: 0; font-size: 16.5px; line-height: 1.55; color: var(--tinta-2); }
+
+@media (max-width: 900px) {
+  .formulario { grid-template-columns: 1fr; gap: 36px; }
+  .formulario__par { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   10 · Rodapé
+   ============================================================ */
+.rodape { margin-top: 56px; background: var(--escuro); color: var(--sobre-escuro); }
+.rodape__topo {
+  max-width: var(--container); margin: 0 auto; padding: 48px 24px;
+  display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px;
+}
+.rodape__marca img { height: 24px; width: auto; margin-bottom: 16px; }
+.rodape__marca p { font-size: 14px; line-height: 1.55; color: rgba(255,255,255,.55); margin: 0; max-width: 30em; }
+.rodape__sociais { display: flex; gap: 14px; margin-top: 20px; }
+.rodape__sociais svg { width: 20px; height: 20px; color: rgba(255,255,255,.55); }
+.rodape__col { display: flex; flex-direction: column; gap: 9px; }
+.rodape__col > .rotulo--marca { color: var(--marca-fraca); margin-bottom: 4px; }
+.rodape__col a { font-size: 14px; color: rgba(255,255,255,.72); }
+.rodape__col a:hover { color: #fff; }
+.rodape__legal {
+  max-width: var(--container); margin: 0 auto; padding: 20px 24px 32px;
+  display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  border-top: 1px solid rgba(255,255,255,.1);
+  font-size: 12.5px; color: rgba(255,255,255,.42);
+}
+
+/* ============================================================
+   11 · Telas menores
+   No mobile o Estadão troca o menu por abas que rolam na horizontal.
+   É o que a barra de editorias vira aqui.
+   ============================================================ */
+@media (max-width: 1180px) {
+  .dobra { grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; }
+  .dobra__titulo { font-size: 40px; }
+  .grade-4 { grid-template-columns: repeat(2, 1fr); gap: 28px 24px; }
+  .mega__grade { grid-template-columns: repeat(2, 1fr); }
+  .rodape__topo { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 900px) {
+  /* Duas linhas de verdade, não uma barra fixa por cima da outra: linha 1
+     com logo e ações, linha 2 com as editorias rolando na horizontal. A
+     versão com `position: fixed` na linha 2 tapava a logo. */
+  .topbar {
+    /* `row-gap: 0`: com gap uniforme sobra um vão morto entre a linha da
+       logo e a das editorias, e o fio divisor descola da linha de cima. */
+    height: auto; flex-wrap: wrap; column-gap: 8px; row-gap: 0;
+    padding: 0 16px; align-items: center;
+  }
+  .topbar__cell--logo { height: 56px; margin-right: 8px; }
+  .topbar__cell--logo img { height: 30px; }
+  .topbar__botao { height: 56px; }
+  /* A régua ocupa a largura toda e o fio de cima atravessa a tela inteira,
+     e não só o miolo: é ele que separa a linha da logo da linha das seções. */
+  .topbar__nav {
+    /* `calc(100% + 32px)` e não `100%`: o item flex mede pela caixa de
+       conteúdo da barra, que já perdeu os 16px de padding de cada lado.
+       Com 100% o fio divisor parava antes da borda da tela. */
+    order: 10; flex: 0 0 calc(100% + 32px); width: auto;
+    height: 42px; gap: 18px;
+    margin: 0 -16px; padding: 0 16px;
+    border-top: 1px solid var(--fio);
+    overflow-x: auto; overflow-y: hidden;
+    /* `auto`, não `smooth`: a rolagem automática é escrita quadro a quadro
+       pelo JS, e o easing do `smooth` brigaria com ela e sairia aos trancos. */
+    scroll-behavior: auto;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .topbar__nav::-webkit-scrollbar { display: none; }
+  .topbar__nav a { font-size: 13px; padding: 5px 0; }
+
+  /* O retângulo azul fica colado na borda esquerda da tela e as outras
+     seções passam por trás dele. `sticky` e não `fixed`: assim ele ainda
+     participa da ordem da régua e continua clicável e alinhado.
+     `left: 0` e a margem negativa levam o bloco até a borda de verdade,
+     vencendo o recuo de 16px da régua. */
+  /* Os dois valores precisam existir e valer -16px, que é o recuo da régua:
+     `left` manda na posição COLADA e `margin-left` na posição NATURAL. Com
+     só um deles, o bloco nascia a 16px da borda e pulava para 0 na primeira
+     rolagem, deixando um vão branco à esquerda e um arrasto visível. */
+  .topbar__nav a.is-atual {
+    position: sticky; left: -16px; z-index: 2;
+    margin-left: -16px;
+    padding: 7px 14px 7px 16px;
+    align-self: stretch; display: flex; align-items: center;
+  }
+  /* Sem rabo de degradê: a palavra que passa por trás é cortada seca na
+     borda do bloco. O degradê deixava a letra desbotando, e a identidade
+     aqui é de ângulo reto, não de esfumaçado. */
+
+  /* Indicador de arraste: barrinha reta, sem canto redondo, como o resto
+     da identidade. Ela mostra a fração visível da régua e anda junto com
+     o dedo, para ficar claro que ali se arrasta. */
+  .topbar__trilho {
+    display: block;
+    order: 11; flex: 0 0 calc(100% + 32px); width: auto;
+    margin: 0 -16px; height: 2px; background: #ededf0;
+    position: relative;
+  }
+  /* Escura, não azul: o azul já marca a seção ATIVA logo acima, e duas
+     barras azuis empilhadas fazem o leitor achar que é a mesma coisa. */
+  .topbar__trilho span {
+    position: absolute; top: 0; left: 0; height: 2px;
+    background: var(--tinta);
+    transition: transform .12s linear;
+  }
+  .topbar__busca { order: 5; }
+  .mega { inset: 101px 0 auto; max-height: calc(100dvh - 101px); }
+
+  /* No celular o painel abre no TOQUE, não no hover, e nasce colado embaixo
+     da régua de seções (a barra tem duas linhas ali, então o topo é 101px e
+     não 68px). O primeiro toque abre; quem já está com o painel aberto e
+     toca de novo, navega. */
+  .painel { top: 101px; max-height: calc(100dvh - 101px); overflow-y: auto; }
+  .painel__inner { grid-template-columns: 1fr; gap: 26px; padding: 24px 16px 30px; }
+  .painel__grade { grid-template-columns: 1fr; gap: 14px; }
+  .painel__destaque { display: none; }
+
+  .corpo, .previsao__interno { padding-left: 16px; padding-right: 16px; }
+  /* No celular a faixa rola na horizontal: seis cidades não cabem, e
+     esconder as do sertão seria escolher a capital de novo. */
+  .previsao__selo { display: none; }
+  .previsao__cidade { padding: 10px 14px; }
+  .previsao__cidade:first-child { border-left: 0; padding-left: 0; }
+
+  .dobra { grid-template-columns: 1fr; gap: 32px; padding-top: 24px; }
+  .dobra__titulo { font-size: 32px; }
+  .dobra__olho { font-size: 16.5px; }
+  .dobra__chamadas { border-left: 0; padding-left: 0; padding-top: 28px; border-top: 1px solid var(--fio); }
+  .marcadores { grid-template-columns: 1fr; }
+
+  .ultimas__destaque { grid-template-columns: 1fr; gap: 16px; }
+  .ultimas__texto h3 { font-size: 24px; }
+  .duplo { grid-template-columns: 1fr; gap: 40px; }
+
+  .materia__titulo { font-size: 32px; }
+  .materia__olho { font-size: 17.5px; }
+  .texto p { font-size: 18px; line-height: 1.65; }
+  .lateral { grid-template-columns: repeat(2, 1fr); }
+
+  /* Em coluna estreita o crédito quebra em várias linhas, e como flex ele
+     deixa o "·" pendurado no fim da linha. Como texto corrido o separador
+     acompanha a palavra. */
+  .assinatura { align-items: flex-start; }
+  .assinatura__quem { display: block; line-height: 1.5; }
+  .assinatura__quem b, .assinatura__quem span { display: inline; }
+  .assinatura__quem span { margin: 0 2px; }
+
+  .cabecalho-secao h1 { font-size: 30px; }
+  .subnav { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; white-space: nowrap; }
+
+  .rodape__topo { grid-template-columns: 1fr; gap: 32px; padding: 40px 16px; }
+}
+
+@media (max-width: 560px) {
+  /* Card vira linha: miniatura à esquerda, texto à direita. Empilhar
+     foto 16:9 em coluna única faria a lista ocupar cinco telas. */
+  .grade-4 { grid-template-columns: 1fr; gap: 20px; }
+  .grade-4 > article {
+    display: grid; grid-template-columns: 118px 1fr;
+    grid-template-rows: auto auto auto; gap: 3px 14px; align-items: start;
+    padding-bottom: 20px; border-bottom: 1px solid var(--fio);
+  }
+  .grade-4 > article img { grid-column: 1; grid-row: 1 / span 3; margin-bottom: 0; }
+  .grade-4 > article .rotulo { grid-column: 2; grid-row: 1; }
+  .grade-4 > article h3 { grid-column: 2; grid-row: 2; font-size: 16px; }
+  .grade-4 > article .tempo { grid-column: 2; grid-row: 3; }
+  /* O último card não leva fio: senão ele soma com o fio de topo da grade
+     seguinte (ou com o do bloco) e vira uma linha dupla. */
+  .grade-4 > article:last-child { border-bottom: 0; padding-bottom: 0; }
+  .grade-4--continuacao { margin-top: 20px; padding-top: 20px; }
+
+  .video { grid-template-columns: 110px 1fr; }
+  .lateral { grid-template-columns: 1fr; }
+  .dobra__titulo { font-size: 28px; }
+  .materia__titulo { font-size: 28px; }
+  .assinatura { gap: 12px; }
+}

@@ -1,0 +1,180 @@
+{% extends "pb/base.html" %}
+{% from "pb/_blocos.html" import card, chamada, faixa, grade4, marcadores %}
+
+{% block titulo %}{{ jornal.nome }} — {{ jornal.slogan }}{% endblock %}
+{% block descricao %}As notícias {{ uf.uf_com_artigo }} em um só lugar: segurança, política, município, esportes e educação, dos {{ total_municipios }} municípios.{% endblock %}
+
+{% block faixa %}
+<!-- ======================= FAIXA DA PREVISÃO =======================
+     Substitui o ticker de manchetes. Ele repetia o que já estava logo
+     abaixo, na dobra; a previsão é informação que não existe em nenhum
+     outro lugar da página, e é a primeira coisa que o leitor de portal
+     local procura de manhã.
+
+     Seis cidades cobrindo as quatro mesorregiões, e não só a capital.
+     Se o worker ainda não buscou, a faixa não aparece: melhor ausente
+     que mostrando temperatura de ontem.
+-->
+{% if tempo %}
+{# A moldura vai por fora do container para o fio de baixo atravessar a
+   tela inteira, como o da barra de navegação. O conteúdo continua preso
+   ao container, no `previsao__interno`. #}
+<div class="previsao">
+  <div class="previsao__interno">
+    <span class="previsao__selo rotulo">Agora {{ uf.uf_com_artigo }}</span>
+    <div class="previsao__pista">
+      {% for c in tempo %}
+      <a class="previsao__cidade" href="/municipio/{{ c.slug }}">
+        <span class="previsao__icone previsao__icone--{{ c.icone }}" aria-hidden="true"></span>
+        <span class="previsao__nome">{{ c.nome }}</span>
+        <b class="previsao__grau">{{ c.temp }}°</b>
+        {# Só a chance de chuva, e só quando é alta. O ícone já diz a
+           condição, e repetir "Chuvisco" por extenso em seis cidades
+           estourava a faixa e cortava o sertão fora da tela. #}
+        {% if c.chuva >= 50 %}<span class="previsao__chuva">{{ c.chuva }}%</span>{% endif %}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block conteudo %}
+
+  <!-- ============================= DOBRA =============================
+       Unidade do Estadão: foto, chapéu, manchete, olho e, embaixo, o
+       desdobramento do mesmo assunto em lista de marcador. À direita,
+       duas unidades menores separadas por um fio vertical.
+  -->
+  {% if manchete %}
+  <section class="dobra">
+    <article class="dobra__principal">
+      {% if manchete.imagem %}<img class="dobra__foto" src="{{ manchete.imagem_grande or manchete.imagem }}" alt="">{% endif %}
+      <div class="dobra__texto">
+        <div class="dobra__meta">
+          <span class="chip rotulo">{{ manchete.editoria }}</span>
+          <span class="rotulo">{{ manchete.tempo }}</span>
+        </div>
+        <h1 class="display dobra__titulo"><a href="{{ manchete.url }}"{{ manchete.alvo }}>{{ manchete.titulo }}{{ manchete.seta }}</a></h1>
+        {% if manchete.resumo %}<p class="dobra__olho">{{ manchete.resumo }}</p>{% endif %}
+        {# crédito do veículo que apurou, não "Redação Paraibão": a matéria é deles. #}
+        <p class="dobra__credito">
+          <b>{{ manchete.fonte }}</b>{% if manchete.municipio %} · {{ manchete.municipio }}{% endif %}
+        </p>
+      </div>
+      {% if chamadas|length > 2 %}{{ marcadores(chamadas[2:]) }}{% endif %}
+    </article>
+
+    <div class="dobra__chamadas">
+      {% for a in chamadas[:2] %}{{ chamada(a) }}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ============================ EM ALTA ============================ -->
+  {% if em_alta %}
+  <section class="bloco">
+    {{ faixa('Em alta', '/ultimas') }}
+    {{ grade4(em_alta) }}
+  </section>
+  {% endif %}
+
+  <!-- =========================== ÚLTIMAS =========================== -->
+  {% if ultimas_destaque or ultimas %}
+  <section class="bloco">
+    {{ faixa('Últimas notícias', '/ultimas') }}
+
+    {% if ultimas_destaque %}
+    <div class="ultimas__destaque">
+      <div class="ultimas__foto">
+        {% if ultimas_destaque.imagem %}<img src="{{ ultimas_destaque.imagem }}" alt="" loading="lazy">{% endif %}
+      </div>
+      <div class="ultimas__texto">
+        <span class="rotulo rotulo--marca">{{ ultimas_destaque.editoria }}</span>
+        <h3 class="display"><a href="{{ ultimas_destaque.url }}"{{ ultimas_destaque.alvo }}>{{ ultimas_destaque.titulo }}{{ ultimas_destaque.seta }}</a></h3>
+        {% if ultimas_destaque.resumo %}<p class="resumo">{{ ultimas_destaque.resumo }}</p>{% endif %}
+        <span class="tempo">{{ ultimas_destaque.fonte }} · {{ ultimas_destaque.tempo }}</span>
+      </div>
+    </div>
+    {% endif %}
+
+    {{ grade4(ultimas, continuacao=true) }}
+  </section>
+  {% endif %}
+
+  <!-- ========================= PRÓXIMO JOGO ========================= -->
+  {# Só renderiza quando existir dado de jogo de verdade; sem fonte de
+     tabela do Paraibano, o bloco não aparece em vez de mostrar placar
+     inventado. #}
+  {% if jogo %}
+  <section class="bloco jogo">
+    {{ faixa('Próximo jogo', '/editoria/esportes') }}
+    <div class="jogo__arena">
+      <div class="jogo__confronto">
+        <div class="jogo__time">
+          <div class="jogo__escudo"></div>
+          <span class="display">{{ jogo.casa }}</span>
+        </div>
+        <span class="display jogo__vs">VS</span>
+        <div class="jogo__time">
+          <div class="jogo__escudo"></div>
+          <span class="display">{{ jogo.fora }}</span>
+        </div>
+      </div>
+      <div class="jogo__quando">{{ jogo.quando }}</div>
+      <div class="display jogo__local">{{ jogo.local }}</div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ======================= DUAS COLUNAS ======================= -->
+  {% if coluna_video or tabela %}
+  <section class="bloco duplo">
+    {% if coluna_video %}
+    <div class="duplo__lado">
+      {{ faixa(coluna_video.titulo, coluna_video.href) }}
+      {% for a in coluna_video.artigos %}
+      <article class="video">
+        <div class="video__thumb">{% if a.imagem %}<img src="{{ a.imagem }}" alt="" loading="lazy">{% endif %}</div>
+        <div class="video__texto">
+          <span class="rotulo rotulo--marca">{{ a.editoria }}</span>
+          <h3 class="display"><a href="{{ a.url }}"{{ a.alvo }}>{{ a.titulo }}{{ a.seta }}</a></h3>
+          <span class="tempo">{{ a.fonte }} · {{ a.tempo }}</span>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if tabela %}
+    <div class="duplo__lado">
+      {{ faixa(tabela.titulo, tabela.href) }}
+      <table class="tabela">
+        <thead>
+          <tr>{% for c in tabela.colunas %}<th>{{ c }}</th>{% endfor %}</tr>
+        </thead>
+        <tbody>
+          {% for linha in tabela.linhas %}
+          <tr>
+            <td><span class="tabela__time"><span class="tabela__escudo"></span>{{ linha.nome }}</span></td>
+            {% for v in linha.valores %}<td>{{ v }}</td>{% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <!-- =================== MUNICÍPIOS =================== -->
+  {# O bloco que diferencia o projeto: matéria com município identificado. #}
+  {% if por_municipio %}
+  <section class="bloco">
+    {{ faixa('Destaque da semana', '/ultimas') }}
+    {{ grade4(por_municipio) }}
+  </section>
+  {% endif %}
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "pb/base.html" %}
+{% from "pb/_blocos.html" import grade4, faixa %}
+
+{% block titulo %}{{ h1 }}{% if pagina > 1 %} · página {{ pagina }}{% endif %} — Paraibão{% endblock %}
+{% block descricao %}{{ descricao_pagina }}{% endblock %}
+
+{% block conteudo %}
+
+{# Cabeçalho de seção no formato do Estadão em /politica/: nome da
+   editoria centralizado na cor da marca e, logo abaixo, a sub-navegação
+   entre dois fios. #}
+<header class="cabecalho-secao">
+  {% if chapeu %}<span class="rotulo cabecalho-secao__chapeu">{{ chapeu }}</span>{% endif %}
+  <h1 class="display">{{ h1 }}</h1>
+  {% if subtitulo %}<p>{{ subtitulo }}</p>{% endif %}
+  <nav class="subnav">
+    <a href="/ultimas">Últimas</a>
+    {% for ed in editorias_nav[:5] %}
+    <a href="/editoria/{{ ed.slug }}">{{ ed.rotulo }}</a>
+    {% endfor %}
+    <a href="/municipios">Municípios</a>
+  </nav>
+</header>
+
+<section class="bloco" style="border-top:0">
+  {% if artigos %}
+    {{ grade4(artigos[:4]) }}
+    {% if artigos|length > 4 %}{{ grade4(artigos[4:8], continuacao=true) }}{% endif %}
+    {% if artigos|length > 8 %}{{ grade4(artigos[8:12], continuacao=true) }}{% endif %}
+    {% if artigos|length > 12 %}{{ grade4(artigos[12:16], continuacao=true) }}{% endif %}
+    {% if artigos|length > 16 %}{{ grade4(artigos[16:20], continuacao=true) }}{% endif %}
+    {% if artigos|length > 20 %}{{ grade4(artigos[20:24], continuacao=true) }}{% endif %}
+
+    {% if pagina > 1 or tem_mais %}
+    <div class="paginacao" style="display:flex;gap:12px;justify-content:center;padding:40px 0 0">
+      {% if pagina > 1 %}<a class="rotulo" href="{{ caminho_base }}?{% if q %}q={{ q|urlencode }}&amp;{% endif %}pagina={{ pagina - 1 }}">← Anterior</a>{% endif %}
+      {% if tem_mais %}<a class="rotulo" href="{{ caminho_base }}?{% if q %}q={{ q|urlencode }}&amp;{% endif %}pagina={{ pagina + 1 }}">Próxima →</a>{% endif %}
+    </div>
+    {% endif %}
+  {% else %}
+    <div class="vazio" style="padding:64px 24px;text-align:center">
+      <h3 class="display">{{ vazio_titulo }}</h3>
+      <p class="resumo">{{ vazio_texto }}</p>
+    </div>
+  {% endif %}
+</section>
+
+{% if vizinhos %}
+<section class="bloco">
+  {{ faixa(vizinhos_titulo, '/municipios') }}
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+    {% for m in vizinhos %}
+    <a href="/municipio/{{ m.slug }}" class="rotulo"
+       style="border:var(--borda);padding:8px 12px">{{ m.name }}</a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

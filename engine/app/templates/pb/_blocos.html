@@ -1,0 +1,57 @@
+{# Macros dos blocos do design. O HTML é o do design-original, com o conteúdo
+   de exemplo trocado por dado.
+
+   Uma regra atravessa tudo: matéria da camada `aggregate` não tem página
+   nossa. O link sai para o veículo de origem, com target e rel corretos e a
+   seta ↗. É o que resolve risco autoral e conteúdo duplicado no Google.
+#}
+
+{# card da grade de 4 (usado em Em alta, Últimas e Destaque da semana) #}
+{% macro card(a) %}
+<article>
+  {% if a.imagem %}<img src="{{ a.imagem }}" alt="" loading="lazy" decoding="async">{% endif %}
+  <span class="rotulo rotulo--marca">{{ a.editoria }}</span>
+  <h3 class="display"><a href="{{ a.url }}"{{ a.alvo }}>{{ a.titulo }}{{ a.seta }}</a></h3>
+  {% if a.resumo %}<p class="resumo">{{ a.resumo }}</p>{% endif %}
+  <span class="tempo">{{ a.tempo }}</span>
+</article>
+{% endmacro %}
+
+{# chamada lateral da dobra #}
+{% macro chamada(a) %}
+<article class="chamada">
+  {% if a.imagem %}<img src="{{ a.imagem }}" alt="" loading="lazy" decoding="async">{% endif %}
+  <div class="chamada__texto">
+    <span class="rotulo rotulo--marca">{{ a.editoria }}</span>
+    <h3 class="display"><a href="{{ a.url }}"{{ a.alvo }}>{{ a.titulo }}{{ a.seta }}</a></h3>
+    <span class="tempo">{{ a.tempo }}</span>
+  </div>
+</article>
+{% endmacro %}
+
+{# Lista de marcador. É o formato que o Estadão usa para amarrar o
+   desdobramento à manchete: sem foto, sem hora, só o ponto e a frase.
+   Serve para o leitor ver que existe mais sobre o mesmo assunto sem
+   que a dobra vire uma parede de cards. #}
+{% macro marcadores(artigos) %}
+<div class="marcadores">
+  {% for a in artigos %}
+  <a href="{{ a.url }}"{{ a.alvo }}>{{ a.titulo }}{{ a.seta }}</a>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{# faixa de seção com o "ver tudo" #}
+{% macro faixa(titulo, href) %}
+<div class="faixa-secao">
+  <h2 class="display">{{ titulo }}</h2>
+  {% if href %}<a href="{{ href }}">Ver tudo →</a>{% endif %}
+</div>
+{% endmacro %}
+
+{# grade de 4 cards, com a variante de continuação #}
+{% macro grade4(artigos, continuacao=false) %}
+<div class="grade-4{% if continuacao %} grade-4--continuacao{% endif %}">
+  {% for a in artigos %}{{ card(a) }}{% endfor %}
+</div>
+{% endmacro %}

@@ -1,0 +1,239 @@
+{# Painel de controle: a máquina rodando.
+
+   Duas regras que explicam o que está e o que NÃO está nesta tela:
+
+   1. Todo número aqui responde uma pergunta de dono. Se subir e não mudar
+      nada na operação nem no caixa, não entra. Por isso não há visitante,
+      impressão nem seguidor.
+   2. Número que exige ação aparece em vermelho e com a ação escrita ao lado.
+      Painel que só informa vira papel de parede na segunda semana.
+
+   Server-rendered, sem JavaScript: é a tela que se abre no celular no meio
+   da rua para saber se o jornal está de pé. #}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>A máquina — {{ jornal.nome }}</title>
+<link href="/static/fontes.css?v={{ assets_v.fontes }}" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css?v={{ assets_v.css }}">
+<style>
+  body { padding: 26px 20px 70px; }
+  .pn { max-width: 1180px; margin: 0 auto; }
+  .pn__topo { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 26px; }
+  .pn h1 { font-family: "Neue Helvena", Helvetica, Arial, sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -.026em; margin: 0; }
+  .pn__nav { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .pn__nav a { font: 700 11px/1 "DM Sans", system-ui, sans-serif; letter-spacing: .07em; text-transform: uppercase; padding: 9px 14px; border: 1px solid var(--fio); color: var(--tinta-2); }
+  .pn__nav a.on { background: var(--marca); border-color: var(--marca); color: #fff; }
+  .pn__quem { font: 400 12px/1.3 "DM Sans", system-ui, sans-serif; color: var(--tinta-3); }
+  .pn__quem b { color: var(--tinta-2); }
+  .pn__quem a { border: 0; padding: 0; text-transform: none; letter-spacing: 0; font-weight: 400; text-decoration: underline; }
+
+  .pn__secao { margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--fio); }
+  .pn__secao > h2 { font-family: "Neue Helvena", Helvetica, Arial, sans-serif; font-size: 19px; font-weight: 800; letter-spacing: -.02em; margin: 0 0 4px; }
+  .pn__secao > p { margin: 0 0 18px; font-size: 13.5px; color: var(--tinta-3); max-width: 62em; }
+
+  .cartoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: var(--fio); border: 1px solid var(--fio); }
+  .cart { background: #fff; padding: 16px 18px; }
+  .cart__rot { font: 700 10.5px/1.2 "DM Sans", system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-3); }
+  .cart__num { font-family: "Neue Helvena", Helvetica, Arial, sans-serif; font-size: 34px; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin: 8px 0 2px; font-variant-numeric: tabular-nums; }
+  .cart__pe { font-size: 12.5px; color: var(--tinta-2); line-height: 1.45; }
+  .cart--alerta .cart__num { color: var(--ponto); }
+  .cart--alerta .cart__pe { color: var(--ponto); font-weight: 700; }
+
+  table.pn__tab { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .pn__tab th { text-align: left; padding: 0 10px 9px 0; font: 700 10.5px/1.2 "DM Sans", system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-3); border-bottom: 1px solid var(--fio); }
+  .pn__tab td { padding: 11px 10px 11px 0; border-bottom: 1px solid var(--fio); vertical-align: top; }
+  .pn__tab td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .selo { font: 700 10px/1 "DM Sans", system-ui, sans-serif; letter-spacing: .07em; text-transform: uppercase; padding: 5px 8px; color: #fff; white-space: nowrap; }
+  .selo--ok { background: #0f7d3f; }
+  .selo--mal { background: var(--ponto); }
+  .selo--off { background: var(--tinta-3); }
+
+  /* Série de produção: barra por dia. Escala relativa ao maior dia, porque o
+     que interessa é a forma da curva, não o valor absoluto. */
+  .serie { display: flex; align-items: flex-end; gap: 5px; height: 92px; }
+  .serie__dia { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; min-width: 0; }
+  .serie__barra { background: #ccd6f7; }
+  .serie__propria { background: var(--marca); }
+  .serie__rot { font-size: 9.5px; color: var(--tinta-3); text-align: center; margin-top: 6px; white-space: nowrap; }
+  .legenda { display: flex; gap: 18px; margin-top: 14px; font-size: 12px; color: var(--tinta-2); }
+  .legenda i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; }
+
+  .buraco { margin-top: 12px; padding: 14px 16px; background: #f7f7f9; border-left: 3px solid var(--tinta-3); font-size: 13.5px; color: var(--tinta-2); line-height: 1.55; }
+  @media (max-width: 700px) { .cartoes { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="pn">
+
+  <div class="pn__topo">
+    <h1>A máquina</h1>
+    <div class="pn__nav">
+      <a class="on" href="/painel/maquina">A máquina</a>
+      <a href="/painel/contatos">Contatos</a>
+      {% if eu and eu.papel == "dono" %}<a href="/painel/equipe">Equipe</a>{% endif %}
+      <a href="/painel">Operação</a>
+      <a href="{{ jornal.base_url }}">Ver o site</a>
+      {% if eu %}
+      <span class="pn__quem"><b>{{ eu.nome }}</b> · <a href="/senha">trocar senha</a> · <a href="/sair">sair</a></span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ================= PRODUTO ================= -->
+  <section class="pn__secao">
+    <h2>A promessa do produto</h2>
+    <p>Um portal que diz cobrir {{ m.cobertura.total }} municípios e cobre doze não tem
+       problema de audiência, tem problema de produto. Nenhum número de acesso mostra isso.</p>
+    <div class="cartoes">
+      <div class="cart{% if m.cobertura.pct < 25 %} cart--alerta{% endif %}">
+        <div class="cart__rot">Cobertura · {{ m.cobertura.dias }} dias</div>
+        <div class="cart__num">{{ m.cobertura.pct }}%</div>
+        <div class="cart__pe">{{ m.cobertura.com_materia }} de {{ m.cobertura.total }} municípios com matéria</div>
+      </div>
+      <div class="cart{% if m.cobertura.nunca_cobertos > m.cobertura.total // 2 %} cart--alerta{% endif %}">
+        <div class="cart__rot">Nunca cobertos</div>
+        <div class="cart__num">{{ m.cobertura.nunca_cobertos }}</div>
+        <div class="cart__pe">municípios sem uma linha até hoje. É a pauta.</div>
+      </div>
+      <div class="cart{% if m.camadas.pct_propria < 10 %} cart--alerta{% endif %}">
+        <div class="cart__rot">Acervo próprio</div>
+        <div class="cart__num">{{ m.camadas.pct_propria }}%</div>
+        <div class="cart__pe">{{ m.camadas.propria }} próprias · {{ m.camadas.agregada }} agregadas.
+          Só a própria tem canonical nosso e entra no Google News.</div>
+      </div>
+      <div class="cart{% if m.frescor.mediana_min and m.frescor.mediana_min > 60 %} cart--alerta{% endif %}">
+        <div class="cart__rot">Frescor · mediana</div>
+        <div class="cart__num">{% if m.frescor.mediana_min is none %}—{% else %}{{ m.frescor.mediana_min }}<span style="font-size:16px">min</span>{% endif %}</div>
+        <div class="cart__pe">entre a fonte publicar e nós coletarmos.
+          {% if m.frescor.p90_min %}9 em 10 em até {{ m.frescor.p90_min }} min.{% endif %}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= IA ================= -->
+  <section class="pn__secao">
+    <h2>A reescrita, nas últimas {{ m.ia.horas }} horas</h2>
+    <p>Aproveitamento baixo é cota queimada em material que as travas reprovam: o custo
+       acontece, o resultado não. Diz se vale subir o teto ou se o problema é a matéria de entrada.</p>
+    <div class="cartoes">
+      <div class="cart{% if m.ia.tentadas and m.ia.aproveitamento < 60 %} cart--alerta{% endif %}">
+        <div class="cart__rot">Aproveitamento</div>
+        <div class="cart__num">{% if m.ia.tentadas %}{{ m.ia.aproveitamento }}%{% else %}—{% endif %}</div>
+        <div class="cart__pe">{{ m.ia.aprovadas }} aprovadas de {{ m.ia.tentadas }} tentativas</div>
+      </div>
+      <div class="cart">
+        <div class="cart__rot">Consumo</div>
+        <div class="cart__num">{{ (m.ia.tokens_entrada + m.ia.tokens_saida) // 1000 }}<span style="font-size:16px">k</span></div>
+        <div class="cart__pe">tokens · {{ m.ia.tokens_entrada // 1000 }}k entrada, {{ m.ia.tokens_saida // 1000 }}k saída</div>
+      </div>
+      <div class="cart{% if not ia_config.configurado %} cart--alerta{% endif %}">
+        <div class="cart__rot">Provedor</div>
+        <div class="cart__num" style="font-size:20px;margin-top:12px">{{ ia_config.modelo }}</div>
+        <div class="cart__pe">{% if ia_config.configurado %}teto de {{ ia_config.teto_dia }}/dia,
+          {{ ia_config.usadas_24h }} usadas{% else %}SEM CREDENCIAL: nenhuma matéria vira texto próprio{% endif %}</div>
+      </div>
+      <div class="cart">
+        <div class="cart__rot">Motivo de recusa</div>
+        {% if m.ia.recusas %}
+        <div class="cart__num" style="font-size:20px;margin-top:12px">{{ m.ia.recusas[0].total }}×</div>
+        <div class="cart__pe">{{ m.ia.recusas[0].motivo }}</div>
+        {% else %}
+        <div class="cart__num">0</div>
+        <div class="cart__pe">nenhuma reprovação na janela</div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FONTES ================= -->
+  <section class="pn__secao">
+    <h2>As fontes</h2>
+    <p>Fonte que para de entregar não gera erro nenhum: ela só some do fluxo. Sem esta
+       coluna dá para perder um veículo por semanas e só notar pela queda do volume.</p>
+    <table class="pn__tab">
+      <thead><tr><th>Veículo</th><th>Degrau</th><th class="num">Matérias</th><th>Última</th><th>Estado</th></tr></thead>
+      <tbody>
+        {% for f in m.fontes %}
+        <tr>
+          <td><b>{{ f.nome }}</b>{% if f.erro %}<div style="font-size:12px;color:var(--ponto);margin-top:4px">{{ f.erro }}</div>{% endif %}</td>
+          <td style="color:var(--tinta-3)">{{ f.degrau }}</td>
+          <td class="num">{{ f.materias }}</td>
+          <td style="color:var(--tinta-2);font-size:13px">{{ f.ultima[:16].replace('T',' ') if f.ultima else 'nunca' }}</td>
+          <td>
+            {% if not f.ativa %}<span class="selo selo--off">desligada</span>
+            {% elif f.silenciosa %}<span class="selo selo--mal">calada</span>
+            {% else %}<span class="selo selo--ok">entregando</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ================= PRODUÇÃO ================= -->
+  <section class="pn__secao">
+    <h2>Produção, últimos {{ m.producao|length }} dias</h2>
+    <p>A forma da curva importa mais que o valor: o que se procura aqui é queda que ninguém viu acontecer.</p>
+    {% if m.producao %}
+    {% set teto = m.producao | map(attribute='total') | max %}
+    <div class="serie">
+      {% for d in m.producao %}
+      <div class="serie__dia" title="{{ d.dia }}: {{ d.total }} matérias, {{ d.propria }} próprias">
+        <div class="serie__barra serie__propria" style="height:{{ (d.propria / teto * 78) | round | int }}px"></div>
+        <div class="serie__barra" style="height:{{ ((d.total - d.propria) / teto * 78) | round | int }}px"></div>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="display:flex;gap:5px">
+      {% for d in m.producao %}<div class="serie__rot" style="flex:1">{{ d.dia[8:] }}</div>{% endfor %}
+    </div>
+    <div class="legenda">
+      <span><i style="background:var(--marca)"></i>própria</span>
+      <span><i style="background:#ccd6f7"></i>agregada</span>
+    </div>
+    {% else %}<p>Sem matéria na janela.</p>{% endif %}
+  </section>
+
+  <!-- ================= COLETA ================= -->
+  <section class="pn__secao">
+    <h2>As últimas rodadas</h2>
+    <p>É isto que prova que a máquina roda. Até hoje só existia em <code>docker logs</code>.</p>
+    <table class="pn__tab">
+      <thead><tr><th>#</th><th>Quando</th><th class="num">Vistas</th><th class="num">Novas</th><th class="num">Falhas</th><th>Estado</th></tr></thead>
+      <tbody>
+        {% for r in m.coleta.rodadas %}
+        <tr>
+          <td style="color:var(--tinta-3)">{{ r.id }}</td>
+          <td style="font-size:13px">{{ r.quando[:16].replace('T',' ') }}</td>
+          <td class="num">{{ r.vistas }}</td>
+          <td class="num"><b>{{ r.novas }}</b></td>
+          <td class="num">{{ r.falhas }}</td>
+          <td>{% if r.status == 'success' and not r.falhas %}<span class="selo selo--ok">ok</span>
+              {% else %}<span class="selo selo--mal">{{ r.status }}</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ================= O QUE FALTA MEDIR ================= -->
+  <section class="pn__secao">
+    <h2>O que este painel ainda não mede</h2>
+    <div class="buraco">
+      <b>Leitor que volta, conversão para assinante e receita.</b> Não estão aqui porque
+      a camada de membros ainda não existe, e não porque foram esquecidos. Preferi deixar
+      o buraco escrito a preencher a tela com visitante único, impressão e seguidor, que
+      sobem sozinhos e não dizem o que fazer amanhã.
+    </div>
+  </section>
+
+  <p style="margin-top:30px;font-size:12px;color:var(--tinta-3)">
+    Gerado em {{ m.gerado_em[:16].replace('T',' ') }} UTC · {{ jornal.nome }}
+  </p>
+</div>
+</body>
+</html>

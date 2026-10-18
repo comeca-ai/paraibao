@@ -1,0 +1,51 @@
+{# Card de matéria.
+
+   A decisão de arquitetura mora aqui: matéria da camada `aggregate` não tem
+   página nossa, o card inteiro é um link que SAI para o veículo de origem.
+   Só `own` e `official` têm página interna. É isso que resolve, de uma vez,
+   o risco autoral e o problema de conteúdo duplicado no Google.
+   O card inteiro é clicável, nunca só o título. #}
+{% macro card(a, destaque=false) %}
+<article class="card">
+  <a class="alvo" href="{{ a.url }}"
+     {% if a.externo %}target="_blank" rel="noopener nofollow"{% endif %}>
+    {% if a.image_url %}
+    <img class="thumb" src="{{ a.image_url }}" alt="" loading="lazy" decoding="async">
+    {% endif %}
+    <h2>{{ a.title }}{% if a.externo %}<span class="sai" aria-label="abre no site de origem">↗</span>{% endif %}</h2>
+    {% if destaque and a.summary %}<p>{{ a.summary }}</p>{% endif %}
+  </a>
+  <div class="meta">
+    {% if a.municipio %}<a href="/municipio/{{ a.municipio.slug }}" class="tag local">{{ a.municipio.name }}</a>{% endif %}
+    <a href="/editoria/{{ a.category }}" class="tag">{{ a.categoria_rotulo }}</a>
+    {% if a.externo %}<span class="fonte-marca">{{ a.fonte }}</span>{% endif %}
+    <span>{{ a.quando }}</span>
+  </div>
+</article>
+{% endmacro %}
+
+{% macro lista_cronologica(itens) %}
+<ul class="cronologico">
+  {% for a in itens %}
+  <li>
+    <a href="{{ a.url }}" {% if a.externo %}target="_blank" rel="noopener nofollow"{% endif %}>
+      <span class="hora">{{ a.hora }}</span>
+      <h3>{{ a.title }}</h3>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endmacro %}
+
+{% macro paginacao(caminho, pagina, tem_mais, q=None) %}
+{% if pagina > 1 or tem_mais %}
+<div class="paginacao">
+  {% if pagina > 1 %}
+  <a href="{{ caminho }}?{% if q %}q={{ q|urlencode }}&amp;{% endif %}pagina={{ pagina - 1 }}">← Anterior</a>
+  {% endif %}
+  {% if tem_mais %}
+  <a href="{{ caminho }}?{% if q %}q={{ q|urlencode }}&amp;{% endif %}pagina={{ pagina + 1 }}">Próxima →</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endmacro %}

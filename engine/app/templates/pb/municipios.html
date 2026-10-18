@@ -1,0 +1,28 @@
+{% extends "pb/base.html" %}
+{% from "pb/_blocos.html" import faixa %}
+
+{% block titulo %}Os {{ total_municipios }} municípios {{ uf.uf_com_artigo }} — {{ jornal.nome }}{% endblock %}
+{% block descricao %}Notícias de cada um dos {{ total_municipios }} municípios {{ uf.uf_com_artigo }}, por mesorregião.{% endblock %}
+
+{% block conteudo %}
+<section class="bloco">
+  <div class="faixa-secao">
+    <h2 class="display">Os {{ total_municipios }} municípios</h2>
+    <a href="/ultimas">{{ com_noticia }} com notícia →</a>
+  </div>
+</section>
+
+{% for regiao in regioes %}
+<section class="bloco">
+  {{ faixa(regiao.nome, none) }}
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+    {% for m in regiao.municipios %}
+    <a href="/municipio/{{ m.slug }}" class="rotulo"
+       style="border:var(--borda);padding:6px 12px{% if not m.total %};opacity:.45{% endif %}">
+      {{ m.name }}{% if m.total %} <em style="font-style:normal;color:var(--marca)">{{ m.total }}</em>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+{% endblock %}

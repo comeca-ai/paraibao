@@ -1,0 +1,153 @@
+{% extends "pb/base.html" %}
+
+{% block titulo %}{{ a.titulo }} — {{ jornal.nome }}{% endblock %}
+{% block descricao %}{{ a.resumo|truncate(180) }}{% endblock %}
+{% block og_tipo %}article{% endblock %}
+{# Matéria com foto compartilha a FOTO; matéria sem foto cai na arte da
+   marca, herdada da base. Só um og:image pode existir na página, senão a
+   plataforma escolhe o primeiro e o resultado vira loteria. #}
+{% block og_imagem %}
+{% if a.imagem_grande %}
+{# Pelo NOSSO proxy, e não pela URL da fonte: a imagem da prévia passa a
+   sair do nosso domínio, com o tipo certo e já redimensionada. Apontar
+   para o veículo de origem deixava a prévia refém de quem pode bloquear
+   hotlink ou responder devagar para o robô. #}
+<meta property="og:image" content="{{ base_url }}{{ a.imagem_grande }}">
+<meta property="og:image:alt" content="{{ a.titulo }}">
+{% else %}
+{{ super() }}
+{% endif %}
+{% endblock %}
+
+{% block og_extra %}
+<meta property="article:published_time" content="{{ a.data.isoformat() if a.data }}">
+<meta property="article:section" content="{{ a.editoria }}">
+{% endblock %}
+
+{% block jsonld %}
+{# NewsArticle declara a autoria como sendo do veículo de origem quando a
+   matéria é agregada. Mentir aqui seria o oposto do que a página faz. #}
+<script type="application/ld+json">{{ jsonld|safe }}</script>
+{% endblock %}
+
+{% block conteudo %}
+
+  {# Trilha no formato do Estadão: o tipo de conteúdo antes do caminho.
+     Deixa explícito, já na primeira linha, se o leitor está em notícia
+     agregada ou em texto nosso. #}
+  <nav class="trilha">
+    <span class="rotulo">{% if modo == 'citacao' %}Chamada{% else %}Notícia{% endif %}</span>
+    <span>•</span>
+    <a href="/">{{ jornal.nome }}</a>
+    <span>/</span>
+    <a href="/editoria/{{ a.editoria_slug }}">{{ a.editoria }}</a>
+    {% if a.municipio %}<span>/</span><a href="/municipio/{{ a.municipio_slug }}">{{ a.municipio }}</a>{% endif %}
+  </nav>
+
+  <article>
+
+    <div class="materia__topo">
+    <header class="materia__cabecalho">
+      <h1 class="display materia__titulo">{{ a.titulo }}</h1>
+
+      {% if a.resumo %}<p class="materia__olho">{{ a.resumo }}</p>{% endif %}
+
+      <div class="assinatura">
+        <div class="assinatura__quem">
+          {# Crédito do veículo que apurou. É exigência do art. 46, I, "a", e
+             não um detalhe de layout. Na camada própria a assinatura é nossa,
+             porque o texto é nosso, mas a apuração continua creditada. #}
+          {% if a.propria %}
+            <b>{{ jornal.nome }}</b><span>·</span><span>com informações do {{ a.fonte }}</span>
+          {% else %}
+            <b>{{ a.fonte }}</b>
+            {% if a.autor %}<span>·</span><span>{{ a.autor }}</span>{% endif %}
+          {% endif %}
+          <span>·</span><span>{{ a.data_extenso }}</span>
+        </div>
+        <div class="compartilhar">
+          <span class="rotulo">Compartilhar</span>
+          <a href="https://wa.me/?text={{ compartilhar_wa }}" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 20l1.3-3.9A8 8 0 1 1 8.1 18.7L4 20z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="https://twitter.com/intent/tweet?url={{ url_absoluta|urlencode }}" target="_blank" rel="noopener" aria-label="X">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </a>
+          <a href="{{ url_absoluta }}" id="copiar" aria-label="Copiar link">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 1 0-5.7-5.7L11.5 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 1 0 5.7 5.7l1.5-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    {% if a.imagem %}
+    <figure class="materia__figura">
+      <img src="{{ a.imagem_grande or a.imagem }}" alt="{{ a.titulo }}">
+      {# Foto de jornal tem autoria própria, do fotógrafo, separada do texto. #}
+      <figcaption>{{ credito_imagem }}</figcaption>
+    </figure>
+    {% endif %}
+    </div>
+
+    {# Coluna única de 728px, como no Estadão. A lista de relacionadas
+       saiu da lateral e virou faixa no fim: com sidebar, a linha de
+       leitura ficava curta demais para texto corrido. #}
+    <div class="materia__corpo">
+      <div class="texto">
+
+        {% if modo == 'citacao' %}
+          {# Camada de agregação: trecho citado com atribuição (art. 46, III),
+             nunca o texto integral, e sempre com o caminho para a obra. #}
+          {% for p in paragrafos %}<p>{{ p }}</p>{% endfor %}
+
+          <blockquote class="materia__origem">
+            <p><b>Esta é uma chamada.</b> O texto acima é um trecho da matéria
+            publicada por <b>{{ a.fonte }}</b>, citado com atribuição. A apuração,
+            o texto completo e as imagens pertencem ao veículo de origem.</p>
+            <a class="mega__botao" href="{{ a.url_origem }}" target="_blank" rel="noopener nofollow">
+              Ler a matéria completa em {{ a.fonte }} →
+            </a>
+          </blockquote>
+        {% else %}
+          {# Texto próprio, escrito a partir do material apurado por terceiro.
+             O fato não é protegido, a forma é: por isso o texto é nosso e o
+             crédito da apuração continua explícito. Ver app/redator.py. #}
+          {% for p in paragrafos %}<p>{{ p }}</p>{% endfor %}
+          {% if a.propria %}
+          <p class="materia__apuracao">Texto do {{ jornal.nome }} a partir de apuração
+            de <a href="{{ a.url_origem }}" target="_blank" rel="noopener nofollow">{{ a.fonte }}</a>.</p>
+          {% endif %}
+        {% endif %}
+
+        <div class="tags">
+          <a href="/editoria/{{ a.editoria_slug }}">{{ a.editoria }}</a>
+          {% if a.municipio %}<a href="/municipio/{{ a.municipio_slug }}">{{ a.municipio }}</a>{% endif %}
+          <a href="/fonte/{{ a.fonte_slug }}">{{ a.fonte }}</a>
+        </div>
+      </div>
+    </div>
+
+    {% if relacionadas %}
+    <aside class="lateral">
+      <div class="lateral__titulo">Leia também</div>
+      {% for r in relacionadas %}
+      <article class="lateral__item">
+        {% if r.imagem %}<img src="{{ r.imagem }}" alt="" loading="lazy">{% endif %}
+        <div class="texto-col">
+          <span class="rotulo rotulo--marca">{{ r.editoria }}</span>
+          <h3 class="display"><a href="{{ r.url }}">{{ r.titulo }}</a></h3>
+        </div>
+      </article>
+      {% endfor %}
+    </aside>
+    {% endif %}
+
+  </article>
+
+<script>
+document.getElementById('copiar')?.addEventListener('click', function (e) {
+  e.preventDefault();
+  navigator.clipboard?.writeText(this.href);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,25 @@
+name: paraibao-gateway
+
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: paraibao-gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d:ro
+      - ./letsencrypt:/etc/letsencrypt:ro
+      - ./certbot:/var/www/certbot:ro
+    networks:
+      - edge_certeiro
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+
+networks:
+  edge_certeiro:
+    external: true

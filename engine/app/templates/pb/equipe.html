@@ -1,0 +1,212 @@
+{# Equipe: quem tem acesso ao painel.
+
+   Só o dono abre esta tela. Ela existe para responder três perguntas que a
+   senha única nunca respondeu: quem entra, quando entrou pela última vez e
+   como se tira o acesso de alguém hoje, sem trocar a senha de todos.
+
+   Não há recuperação por e-mail ainda, então o reset é presencial: o dono
+   gera uma senha temporária, ela aparece UMA vez na tela, e quem recebe é
+   obrigado a trocar no primeiro acesso. É menos elegante que link por e-mail
+   e é honesto sobre o que existe hoje. #}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Equipe — {{ jornal.nome }}</title>
+<link href="/static/fontes.css?v={{ assets_v.fontes }}" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css?v={{ assets_v.css }}">
+<style>
+  body { padding: 26px 20px 70px; }
+  .pn { max-width: 1180px; margin: 0 auto; }
+  .pn__topo { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 26px; }
+  .pn h1 { font-family: "Neue Helvena", Helvetica, Arial, sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -.026em; margin: 0; }
+  .pn__nav { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .pn__nav a { font: 700 11px/1 "DM Sans", system-ui, sans-serif; letter-spacing: .07em; text-transform: uppercase; padding: 9px 14px; border: 1px solid var(--fio); color: var(--tinta-2); }
+  .pn__nav a.on { background: var(--marca); border-color: var(--marca); color: #fff; }
+  .pn__quem { font: 400 12px/1.3 "DM Sans", system-ui, sans-serif; color: var(--tinta-3); }
+  .pn__quem b { color: var(--tinta-2); }
+
+  .pn__secao { margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--fio); }
+  .pn__secao > h2 { font-family: "Neue Helvena", Helvetica, Arial, sans-serif; font-size: 19px; font-weight: 800; letter-spacing: -.02em; margin: 0 0 4px; }
+  .pn__secao > p { margin: 0 0 18px; font-size: 13.5px; color: var(--tinta-3); max-width: 62em; }
+
+  table.pn__tab { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .pn__tab th { text-align: left; padding: 0 10px 9px 0; font: 700 10.5px/1.2 "DM Sans", system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-3); border-bottom: 1px solid var(--fio); }
+  .pn__tab td { padding: 13px 10px 13px 0; border-bottom: 1px solid var(--fio); vertical-align: middle; }
+  .pn__tab td.acoes { text-align: right; white-space: nowrap; }
+  .pn__nome { font-weight: 700; }
+  .pn__email { color: var(--tinta-2); font-size: 13px; }
+
+  .selo { display: inline-block; font: 700 10px/1 "DM Sans", system-ui, sans-serif; letter-spacing: .07em; text-transform: uppercase; padding: 5px 8px; color: #fff; white-space: nowrap; }
+  .selo--dono { background: var(--marca); }
+  .selo--editor { background: #0f7d3f; }
+  .selo--assinante { background: var(--tinta-3); }
+  .selo--off { background: var(--ponto); }
+  .selo--eu { background: #fff; color: var(--tinta-3); border: 1px solid var(--fio); }
+
+  .mini { font: 700 10.5px/1 "DM Sans", system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; padding: 8px 11px; border: 1px solid var(--fio); background: #fff; color: var(--tinta-2); cursor: pointer; margin-left: 6px; }
+  .mini:hover { border-color: var(--marca); color: var(--marca); }
+  .mini--perigo:hover { border-color: var(--ponto); color: var(--ponto); }
+
+  .aviso { padding: 13px 15px; margin-bottom: 22px; font-size: 13.5px; line-height: 1.55; border-left: 3px solid var(--ponto); background: #fdf0f1; color: #8e0714; }
+  .aviso--ok { border-left-color: #0f7d3f; background: #eef7f1; color: #0b5c2e; }
+
+  /* A senha temporária aparece uma vez só. O bloco é grande e monoespaçado
+     porque ela vai ser copiada à mão ou lida em voz alta no telefone. */
+  .senha1x { padding: 18px 20px; margin-bottom: 22px; background: var(--marca-fundo); border-left: 3px solid var(--marca); }
+  .senha1x p { margin: 0 0 10px; font-size: 13.5px; color: var(--tinta-2); line-height: 1.55; }
+  .senha1x code { display: inline-block; font: 700 22px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .06em; color: var(--tinta); background: #fff; padding: 12px 16px; border: 1px solid var(--marca-fraca); user-select: all; }
+
+  .form { display: grid; grid-template-columns: 1.1fr 1.4fr .8fr auto; gap: 12px; align-items: end; max-width: 900px; }
+  .campo label { display: block; margin-bottom: 7px; font: 700 10.5px/1 "DM Sans", system-ui, sans-serif; letter-spacing: .085em; text-transform: uppercase; color: var(--tinta-3); }
+  .campo input, .campo select { width: 100%; box-sizing: border-box; padding: 12px 13px; font: 400 14.5px/1.2 "DM Sans", system-ui, sans-serif; color: var(--tinta); background: #fff; border: 1px solid var(--fio); border-radius: 0; -webkit-appearance: none; }
+  .campo select { background-image: none; }
+  .campo input:focus, .campo select:focus { outline: none; border-color: var(--marca); box-shadow: inset 0 0 0 1px var(--marca); }
+  .botao { padding: 13px 20px; font: 700 11.5px/1 "DM Sans", system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #fff; background: var(--marca); border: 0; cursor: pointer; }
+  .botao:hover { background: #1a3bc4; }
+
+  @media (max-width: 820px) {
+    .form { grid-template-columns: 1fr 1fr; }
+    .pn__tab thead { display: none; }
+    .pn__tab tr { display: block; border-bottom: 1px solid var(--fio); padding: 14px 0; }
+    .pn__tab td { display: block; border: 0; padding: 3px 0; }
+    .pn__tab td.acoes { text-align: left; margin-top: 10px; }
+    .mini { margin: 0 6px 6px 0; }
+  }
+</style>
+</head>
+<body>
+<div class="pn">
+
+  <div class="pn__topo">
+    <h1>Equipe</h1>
+    <div class="pn__nav">
+      <a href="/painel/maquina">A máquina</a>
+      <a href="/painel/contatos">Contatos</a>
+      <a class="on" href="/painel/equipe">Equipe</a>
+      <a href="/painel">Operação</a>
+      <span class="pn__quem"><b>{{ eu.nome }}</b> · <a href="/senha" style="border:0;padding:0;text-transform:none;letter-spacing:0;font-weight:400;text-decoration:underline">trocar senha</a> · <a href="/sair" style="border:0;padding:0;text-transform:none;letter-spacing:0;font-weight:400;text-decoration:underline">sair</a></span>
+    </div>
+  </div>
+
+  {% if erro %}<div class="aviso">{{ erro }}</div>{% endif %}
+  {% if recado %}<div class="aviso aviso--ok">{{ recado }}</div>{% endif %}
+
+  {% if senha_temporaria %}
+  <div class="senha1x">
+    <p>
+      Senha temporária de <b>{{ senha_temporaria.email }}</b>. Ela
+      <b>não aparece de novo</b>: copie agora e entregue pessoalmente ou por
+      um canal que você confie. Quem receber é obrigado a trocar no primeiro
+      acesso.
+    </p>
+    <code>{{ senha_temporaria.senha }}</code>
+  </div>
+  {% endif %}
+
+  <!-- ================= QUEM TEM ACESSO ================= -->
+  <section class="pn__secao">
+    <h2>Quem tem acesso</h2>
+    <p>
+      Ninguém é apagado: quem sai do jornal fica desativado, as sessões dele
+      caem na hora e o histórico continua de pé.
+    </p>
+
+    <table class="pn__tab">
+      <thead>
+        <tr>
+          <th>Pessoa</th>
+          <th>Papel</th>
+          <th>Último acesso</th>
+          <th>Sessões</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in usuarios %}
+        <tr>
+          <td>
+            <div class="pn__nome">{{ u.nome }}
+              {% if u.id == eu.id %}<span class="selo selo--eu">você</span>{% endif %}
+            </div>
+            <div class="pn__email">{{ u.email }}</div>
+          </td>
+          <td>
+            <span class="selo selo--{{ u.papel }}">{{ u.papel_rotulo }}</span>
+            {% if not u.ativo %}<span class="selo selo--off">desativado</span>{% endif %}
+          </td>
+          <td>{{ u.ultimo_acesso }}</td>
+          <td>{{ u.sessoes }}</td>
+          <td class="acoes">
+            {% if u.ativo %}
+              <form method="post" action="/painel/equipe/senha" style="display:inline">
+                <input type="hidden" name="id" value="{{ u.id }}">
+                <button class="mini" type="submit">Nova senha</button>
+              </form>
+              {% if u.sessoes %}
+              <form method="post" action="/painel/equipe/sessoes" style="display:inline">
+                <input type="hidden" name="id" value="{{ u.id }}">
+                <button class="mini" type="submit">Encerrar sessões</button>
+              </form>
+              {% endif %}
+              {% if u.id != eu.id %}
+              <form method="post" action="/painel/equipe/estado" style="display:inline">
+                <input type="hidden" name="id" value="{{ u.id }}">
+                <input type="hidden" name="ativo" value="0">
+                <button class="mini mini--perigo" type="submit">Desativar</button>
+              </form>
+              {% endif %}
+            {% else %}
+              <form method="post" action="/painel/equipe/estado" style="display:inline">
+                <input type="hidden" name="id" value="{{ u.id }}">
+                <input type="hidden" name="ativo" value="1">
+                <button class="mini" type="submit">Reativar</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ================= ADICIONAR ================= -->
+  <section class="pn__secao">
+    <h2>Adicionar alguém</h2>
+    <p>
+      A senha é gerada aqui e mostrada uma vez. Não existe cadastro aberto no
+      painel de propósito: quem entra, entra por convite.
+    </p>
+
+    <form class="form" method="post" action="/painel/equipe/criar">
+      <div class="campo">
+        <label for="nome">Nome</label>
+        <input id="nome" name="nome" type="text" maxlength="160" required>
+      </div>
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" required>
+      </div>
+      <div class="campo">
+        <label for="papel">Papel</label>
+        <select id="papel" name="papel">
+          <option value="editor">Editor</option>
+          <option value="dono">Dono</option>
+        </select>
+      </div>
+      <button class="botao" type="submit">Criar conta</button>
+    </form>
+
+    <p style="margin-top:16px;font-size:13px;color:var(--tinta-3);line-height:1.6;max-width:62em">
+      <b>Editor</b> abre o painel inteiro e comanda a máquina.
+      <b>Dono</b> faz tudo isso e ainda mexe nesta tela.
+      O papel <b>assinante</b> existe no banco mas ainda não tem porta de
+      entrada: ele é o encaixe da assinatura, que ainda não foi construída.
+    </p>
+  </section>
+
+</div>
+</body>
+</html>

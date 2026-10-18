@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card, paginacao %}
+
+{% block titulo %}{{ h1 }}{% if pagina > 1 %} | página {{ pagina }}{% endif %} | Paraibão{% endblock %}
+{% block descricao %}{{ descricao_pagina }}{% endblock %}
+
+{% block conteudo %}
+<div class="cabeca">
+  {% if chapeu %}<div class="chapeu">{{ chapeu }}</div>{% endif %}
+  <h1>{{ h1 }}</h1>
+  {% if subtitulo %}<p>{{ subtitulo }}</p>{% endif %}
+</div>
+
+{% if artigos %}
+<div class="grade">
+  {% for a in artigos %}{{ card(a) }}{% endfor %}
+</div>
+{{ paginacao(caminho_base, pagina, tem_mais, q) }}
+{% else %}
+<div class="vazio">
+  <strong>{{ vazio_titulo }}</strong>
+  {{ vazio_texto }}
+</div>
+{% endif %}
+
+{% if vizinhos %}
+<div class="secao">
+  <div class="secao-topo"><h2>{{ vizinhos_titulo }}</h2></div>
+  <div class="nuvem">
+    {% for m in vizinhos %}<a href="/municipio/{{ m.slug }}">{{ m.name }}</a>{% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

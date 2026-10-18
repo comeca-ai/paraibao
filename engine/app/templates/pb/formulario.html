@@ -1,0 +1,122 @@
+{% extends "pb/base.html" %}
+
+{# Página das duas portas de entrada: anunciante e quem quer escrever no
+   jornal. Um template só porque a estrutura é idêntica; o que muda são os
+   textos e dois campos, controlados por `tipo`.
+
+   O formulário é HTML puro, com POST de verdade e recarga de página. Sem
+   JavaScript: quem chega por link de rede social em celular ruim precisa
+   conseguir enviar, e um envio que depende de script é um envio a menos. #}
+
+{% block titulo %}{{ titulo }} — {{ jornal.nome }}{% endblock %}
+{% block descricao %}{{ descricao }}{% endblock %}
+
+{% block conteudo %}
+
+<header class="cabecalho-secao">
+  <span class="rotulo cabecalho-secao__chapeu">{{ chapeu }}</span>
+  <h1 class="display">{{ titulo }}</h1>
+  <p>{{ subtitulo }}</p>
+</header>
+
+<section class="bloco" style="border-top:0">
+  <div class="formulario">
+
+    <div class="formulario__lado">
+      <h2 class="display formulario__h2">{{ lado_titulo }}</h2>
+      <ul class="formulario__lista">
+        {% for item in argumentos %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+      <p class="formulario__nota">{{ nota }}</p>
+    </div>
+
+    {% if enviado %}
+    <div class="formulario__ok">
+      <h2 class="display">Recebemos sua mensagem</h2>
+      <p>{{ texto_ok }}</p>
+      <a class="botao" href="/">Voltar para a home</a>
+    </div>
+    {% else %}
+    <form class="formulario__campos" method="post" action="{{ acao }}" novalidate>
+      {% if erro %}<p class="formulario__erro" role="alert">{{ erro }}</p>{% endif %}
+
+      {# Armadilha invisível: robô de formulário preenche tudo que encontra.
+         Fica escondido por CSS e sem rótulo visível, então humano nunca vê.
+         `tabindex=-1` e `autocomplete=off` evitam que o teclado caia nele. #}
+      <div class="formulario__armadilha" aria-hidden="true">
+        <label for="site">Não preencha este campo</label>
+        <input type="text" id="site" name="site" tabindex="-1" autocomplete="off">
+      </div>
+
+      <label>
+        <span>Nome completo</span>
+        <input type="text" name="nome" required maxlength="160"
+               value="{{ valores.nome or '' }}" autocomplete="name">
+      </label>
+
+      {% if tipo == 'anuncio' %}
+      <label>
+        <span>Empresa ou negócio</span>
+        <input type="text" name="empresa" required maxlength="160"
+               value="{{ valores.empresa or '' }}" autocomplete="organization">
+      </label>
+      {% endif %}
+
+      <div class="formulario__par">
+        <label>
+          <span>E-mail</span>
+          <input type="email" name="email" required maxlength="200"
+                 value="{{ valores.email or '' }}" autocomplete="email">
+        </label>
+        <label>
+          <span>WhatsApp</span>
+          <input type="tel" name="telefone" required maxlength="40"
+                 placeholder="(83) 99999-9999"
+                 value="{{ valores.telefone or '' }}" autocomplete="tel">
+        </label>
+      </div>
+
+      <div class="formulario__par">
+        <label>
+          <span>Cidade</span>
+          <input type="text" name="cidade" maxlength="120"
+                 value="{{ valores.cidade or '' }}">
+        </label>
+        {% if tipo == 'colaborador' %}
+        <label>
+          <span>Seção de interesse</span>
+          <select name="area">
+            {% for a in areas %}
+            <option value="{{ a }}"{% if valores.area == a %} selected{% endif %}>{{ a }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        {% endif %}
+      </div>
+
+      {% if tipo == 'colaborador' %}
+      <label>
+        <span>Link de algo que você escreveu <em>(opcional)</em></span>
+        <input type="text" name="link" maxlength="500"
+               placeholder="blog, rede social, PDF, o que tiver"
+               value="{{ valores.link or '' }}">
+      </label>
+      {% endif %}
+
+      <label>
+        <span>{{ rotulo_mensagem }}</span>
+        <textarea name="mensagem" rows="5" required maxlength="4000">{{ valores.mensagem or '' }}</textarea>
+      </label>
+
+      <button class="botao" type="submit">{{ rotulo_botao }}</button>
+      <p class="formulario__legal">
+        Seus dados ficam com o {{ jornal.nome }} e servem só para responder você.
+        Não repassamos para terceiros.
+      </p>
+    </form>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}
